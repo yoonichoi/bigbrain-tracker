@@ -1,5 +1,16 @@
 # 🧠 말랑말랑 리트코드 - Big Brain LeetCode Challenge Tracker
-~~(Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠오르길래!)~~
+
+<div align="center">
+
+**[🇰🇷 한국어](README.md) | [🇺🇸 English](README_EN.md)**
+
+</div>
+
+<p align="center"><sub><i>Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠오르길래!</i></sub></p>
+<p align="center">
+  <img src="./screenshots/BigBrain.png" alt="Main Screenshot" width="600"/>
+</p>
+
 
 매일 리트코드 문제를 풀고 인증하는 스터디 그룹을 위한 **간편한 체크인 시스템**입니다.  
 Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료로 운영할 수 있으며,
