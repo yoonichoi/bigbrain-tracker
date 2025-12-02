@@ -473,10 +473,10 @@
                     registerBtn.disabled = false;
                     registerBtn.textContent = '등록하기';
                 } else if (result.status === 'success') {
-                    showSuccess('등록 완료!', `${username}님, 이제 인증 탭에서 매일 인증하세요!`);
+                    showSuccess('등록 완료!', `${username}님, 환영합니다!<br><br>이제 인증 탭에서 매일 인증하세요! 🎉<br><br><small style="color: #999;">3초 후 자동으로 이동합니다...</small>`);
                     setTimeout(() => {
                         location.reload();
-                    }, 2000);
+                    }, 3000);
                 } else {
                     throw new Error(result.message || '알 수 없는 오류');
                 }

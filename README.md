@@ -103,24 +103,36 @@ const REGISTER_CODE = 'your_registration_code';  // config.js와 동일하게!
 
 1. **GitHub 저장소에 푸시**
    ```bash
-   git init
    git add .
    git commit -m "Initial commit"
-   git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
-   git branch -M main
-   git push -u origin main
+   git push origin main
    ```
 
 2. **Netlify 배포**
    - [Netlify](https://netlify.com) 로그인
    - **Add new site** > **Import an existing project**
    - GitHub 저장소 선택
-   - **Publish directory**: 비워두기 (루트 폴더 사용)
-   - **Deploy** 클릭
 
-3. **완료!**
+3. **환경 변수 설정** (중요! 🔐)
+   
+   Netlify Dashboard에서:
+   - **Site settings** > **Environment variables** 클릭
+   - 다음 4개 변수 추가:
+   
+   | 변수명 | 값 |
+   |--------|-----|
+   | `SCRIPT_URL` | Google Apps Script 배포 URL |
+   | `REGISTER_CODE` | 등록코드 (예: bigbrain2026) |
+   | `ADMIN_PASSWORD` | 관리자 비밀번호 |
+   | `SHEET_URL` | 구글 시트 URL |
+
+4. **배포 트리거**
+   - **Deploys** 탭 > **Trigger deploy** > **Deploy site** 클릭
+   - 빌드가 완료될 때까지 대기 (약 30초)
+
+5. **완료!**
    - `https://your-site-name.netlify.app` 에서 확인
-   - `config.js`는 자동으로 배포됨 (GitHub에는 올라가지 않음)
+   - 환경 변수는 안전하게 관리되며 GitHub에 노출되지 않음 ✅
 
 > 💡 **왜 Netlify?**: 자동 배포, 빠른 속도, 무료, 민감 정보 관리 쉬움
 

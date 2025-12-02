@@ -47,6 +47,11 @@ Desktop.ini
 frontend/config.js
 config.js
 
+# Environment files
+.env
+.env.local
+.env.*.local
+
 # Logs
 logs
 *.log
