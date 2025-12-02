@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말랑말랑 리트코드</title>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .icon {
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .date {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .success {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .success h2 {
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        
+        .success p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .history-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+        
+        .history-date {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 70px;
+        }
+        
+        .history-problem {
+            flex: 1;
+            color: #333;
+            margin-left: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">💻</div>
+        <h1>말랑말랑 리트코드</h1>
+        
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <div class="tab" onclick="switchTab('register')">👤 등록</div>
+            <div class="tab active" onclick="switchTab('checkin')">✅ 인증</div>
+            <div class="tab" onclick="switchTab('history')">📜 내 기록</div>
+        </div>
+        
+        <!-- 등록 페이지 -->
+        <div id="register-page" class="page">
+            <h2>신규 등록</h2>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label>등록코드 🔑</label>
+                    <input type="password" id="register-code" placeholder="등록코드를 입력하세요" required autofocus>
+                    <small style="color: #999; font-size: 0.85em; display: block; margin-top: 5px;">
+                        관리자에게 등록코드를 받으세요
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="register-username" placeholder="홍길동" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>비밀번호 (4자리 숫자)</label>
+                    <input type="password" id="register-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
+                </div>
+                
+                <button type="submit" id="register-btn">등록하기</button>
+                <div class="error" id="register-error"></div>
+            </form>
+        </div>
+        
+        <!-- 인증 페이지 -->
+        <div id="checkin-page" class="page active">
+            <h2>매일 인증</h2>
+            <div class="date" id="today-date"></div>
+            
+            <form id="checkin-form">
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="checkin-username" list="username-list" placeholder="이름 입력..." autocomplete="off" required>
+                    <datalist id="username-list"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label>비밀번호 (4자리)</label>
+                    <input type="password" id="checkin-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>문제 이름 (선택)</label>
+                    <input type="text" id="problem" placeholder="Two Sum">
+                </div>
+                
+                <button type="submit" id="checkin-btn">✅ 인증 완료</button>
+                <div class="error" id="checkin-error"></div>
+            </form>
+        </div>
+        
+        <!-- 내 기록 페이지 -->
+        <div id="history-page" class="page">
+            <h2>📜 내 인증 기록</h2>
+            
+            <div class="form-group">
+                <label>이름 입력</label>
+                <input type="text" id="history-username" list="history-username-list" placeholder="이름 입력..." autocomplete="off">
+                <datalist id="history-username-list"></datalist>
+            </div>
+            
+            <button onclick="loadMyHistory()" id="load-history-btn">🔍 내 기록 보기</button>
+            
+            <div id="my-stats" style="display: none; margin-top: 30px;">
+                <div class="stats-card">
+                    <h3 style="color: white; margin-bottom: 10px;">통계</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">총 인증 횟수</div>
+                            <div class="stat-value" id="my-total-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">최근 인증</div>
+                            <div class="stat-value" style="font-size: 1.5em;" id="my-last-date">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="color: #555; margin-bottom: 15px; font-size: 1em;">최근 10개 기록</h3>
+                <div id="my-history-list"></div>
+            </div>
+            
+            <div class="error" id="history-error" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- 성공 화면 -->
+        <div class="success" id="success-container">
+            <div class="success-icon">✅</div>
+            <h2>완료!</h2>
+            <p id="success-message"></p>
+        </div>
+    </div>
+    
+    <script>
+        // ⭐ Google Apps Script URL (config.js에서 로드됨)
+        const SCRIPT_URL = CONFIG.SCRIPT_URL;
+        
+        // 오늘 날짜 자동 계산 (미국 EST 기준)
+        const today = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+        
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateStr = `${month}/${day}`;
+        
+        const estTimeStr = today.toLocaleString('en-US', {
+            timeZone: "America/New_York",
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        
+        document.getElementById('today-date').innerHTML = `Today: ${dateStr} <span style="font-size: 0.8em; color: #999;">(EST - ${estTimeStr})</span>`;
+        
+        // 탭 전환
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabName + '-page').classList.add('active');
+            
+            if (tabName === 'history') {
+                loadUsersForHistory();
+            }
+        }
+        
+        // 페이지 로드 시 사용자 목록 불러오기
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+        
+        // 사용자 목록 불러오기 (인증 탭)
+        async function loadUsers() {
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getUsers');
+                const result = await response.json();
+                
+                const datalist = document.getElementById('username-list');
+                datalist.innerHTML = '';
+                
+                result.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user;
+                    datalist.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('사용자 목록 로드 실패:', error);
+            }
+        }
+        
+        // 내 기록 탭용 사용자 목록
+        async function loadUsersForHistory() {
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getUsers');
+                const result = await response.json();
+                
+                const datalist = document.getElementById('history-username-list');
+                datalist.innerHTML = '';
+                
+                result.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user;
+                    datalist.appendChild(option);
+                });
+            } catch (error) {
+                console.error('사용자 목록 로드 실패:', error);
+            }
+        }
+        
+        // 등록
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const registerCode = document.getElementById('register-code').value.trim();
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const registerBtn = document.getElementById('register-btn');
+            const errorMsg = document.getElementById('register-error');
+            
+            // 등록코드 검증
+            if (registerCode !== CONFIG.REGISTER_CODE) {
+                showError('register-error', '등록코드가 올바르지 않습니다!');
+                return;
+            }
+            
+            if (password.length !== 4) {
+                showError('register-error', '4자리 숫자를 입력해주세요!');
+                return;
+            }
+            
+            registerBtn.disabled = true;
+            registerBtn.textContent = '등록 중...';
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        registerCode: registerCode,
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'invalid_code') {
+                    showError('register-error', '등록코드가 올바르지 않습니다!');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = '등록하기';
+                } else if (result.status === 'duplicate') {
+                    showError('register-error', '이미 등록된 사용자입니다!');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = '등록하기';
+                } else if (result.status === 'success') {
+                    showSuccess('등록 완료!', `${username}님, 이제 인증 탭에서 매일 인증하세요!`);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || '알 수 없는 오류');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('register-error', '등록 실패! 다시 시도해주세요.');
+                registerBtn.disabled = false;
+                registerBtn.textContent = '등록하기';
+            }
+        });
+        
+        // 인증
+        document.getElementById('checkin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('checkin-username').value.trim();
+            const password = document.getElementById('checkin-password').value;
+            const problem = document.getElementById('problem').value.trim() || '미입력';
+            const checkinBtn = document.getElementById('checkin-btn');
+            const errorMsg = document.getElementById('checkin-error');
+            
+            if (!username) {
+                showError('checkin-error', '이름을 입력해주세요!');
+                return;
+            }
+            
+            if (password.length !== 4) {
+                showError('checkin-error', '4자리 비밀번호를 입력해주세요!');
+                return;
+            }
+            
+            checkinBtn.disabled = true;
+            checkinBtn.textContent = '전송 중...';
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=checkin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        date: dateStr,
+                        problem: problem,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                console.log('🔍 Response Status:', response.status);
+                console.log('🔍 Response OK:', response.ok);
+                
+                const responseText = await response.text();
+                console.log('🔍 Response Text:', responseText);
+                
+                const result = JSON.parse(responseText);
+                console.log('🔍 Parsed Result:', result);
+                
+                if (result.status === 'unauthorized') {
+                    showError('checkin-error', '비밀번호가 틀렸습니다!');
+                    checkinBtn.disabled = false;
+                    checkinBtn.textContent = '✅ 인증 완료';
+                } else if (result.status === 'duplicate') {
+                    showError('checkin-error', '이미 오늘 인증하셨습니다!');
+                    checkinBtn.disabled = false;
+                    checkinBtn.textContent = '✅ 인증 완료';
+                } else if (result.status === 'success') {
+                    showSuccess('인증 완료!', `${username}님의 ${dateStr} 인증이 완료되었습니다!<br><br>총 <strong>${result.totalCount}일</strong> 인증 완료 🎉`);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                } else {
+                    throw new Error(result.message || '알 수 없는 오류');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('checkin-error', '전송 실패! 관리자에게 문의하세요.');
+                checkinBtn.disabled = false;
+                checkinBtn.textContent = '✅ 인증 완료';
+            }
+        });
+        
+        // 내 기록 로드
+        async function loadMyHistory() {
+            const username = document.getElementById('history-username').value.trim();
+            const btn = document.getElementById('load-history-btn');
+            const errorMsg = document.getElementById('history-error');
+            const statsDiv = document.getElementById('my-stats');
+            
+            errorMsg.style.display = 'none';
+            
+            if (!username) {
+                showError('history-error', '이름을 입력해주세요!');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '로딩 중...';
+            
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=stats&username=' + encodeURIComponent(username));
+                const result = await response.json();
+                
+                if (result.count === 0) {
+                    showError('history-error', '인증 기록이 없습니다.');
+                    statsDiv.style.display = 'none';
+                } else {
+                    document.getElementById('my-total-count').textContent = result.count;
+                    document.getElementById('my-last-date').textContent = result.lastDate || '-';
+                    
+                    const historyHTML = result.history.map(item => `
+                        <div class="history-item">
+                            <span class="history-date">${item.date}</span>
+                            <span class="history-problem">${item.problem}</span>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('my-history-list').innerHTML = historyHTML;
+                    statsDiv.style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('history-error', '데이터 로드 실패. 다시 시도해주세요.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 내 기록 보기';
+            }
+        }
+        
+        function showError(id, message) {
+            const errorMsg = document.getElementById(id);
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+        
+        function showSuccess(title, message) {
+            document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+            const successDiv = document.getElementById('success-container');
+            successDiv.querySelector('h2').textContent = title;
+            successDiv.querySelector('p').innerHTML = message;
+            successDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
