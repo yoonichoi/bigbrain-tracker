@@ -67,13 +67,15 @@
         
         .tab {
             flex: 1;
-            padding: 12px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
             color: #666;
             font-weight: 500;
+            font-size: 15px;
+            white-space: nowrap;
         }
         
         .tab:hover {
@@ -83,6 +85,18 @@
         .tab.active {
             color: #667eea;
             border-bottom-color: #667eea;
+        }
+        
+        /* 모바일 최적화 */
+        @media (max-width: 480px) {
+            .tab {
+                padding: 10px 4px;
+                font-size: 13px;
+            }
+            
+            .card {
+                padding: 30px 20px;
+            }
         }
         
         .page {
