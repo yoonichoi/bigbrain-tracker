@@ -56,46 +56,35 @@ Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운�
    - 액세스 권한: **모든 사용자**
 6. 배포 URL 복사 (예: `https://script.google.com/macros/s/ABC.../exec`)
 
-### 2️⃣ 프론트엔드 설정
+### 2️⃣ 로컬 테스트 설정 (선택사항)
 
-#### config.js 파일 생성
+로컬에서 테스트하려면 `config.js` 파일을 생성하세요:
+
 ```bash
-# frontend 폴더에서
-cd frontend
+# 프로젝트 루트에서
 cp config.example.js config.js
 ```
 
-#### config.js 수정
+그런 다음 `config.js`를 실제 값으로 수정:
 ```javascript
 const CONFIG = {
-  // Google Apps Script 배포 URL (1단계에서 복사한 URL)
   SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
-  
-  // 등록코드 (신규 사용자 등록 시 필요)
-  // 스터디 그룹 멤버에게만 공유하세요!
   REGISTER_CODE: 'your_registration_code',
-  
-  // 관리자 비밀번호 (원하는 비밀번호로 변경)
   ADMIN_PASSWORD: 'your_secure_password',
-  
-  // 구글 시트 URL (1단계의 스프레드시트 URL)
   SHEET_URL: 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit'
 };
 ```
 
-> ⚠️ **중요**: 
-> - `config.js`는 `.gitignore`에 포함되어 GitHub에 올라가지 않습니다
-> - `REGISTER_CODE`는 스터디 그룹 멤버에게만 공유하세요
-> - 개인정보가 포함되어 있으므로 절대 GitHub에 푸시하지 마세요!
+> 💡 **참고**: 
+> - 로컬 테스트용입니다 (`.gitignore`에 포함됨)
+> - Netlify 배포 시에는 환경 변수를 사용하므로 이 파일이 필요 없습니다
 
 #### 백엔드 등록코드 설정
-Google Apps Script 에디터에서 `backend/Code.gs` 파일 9번째 줄의 `REGISTER_CODE`를 `config.js`와 **동일하게** 설정하세요:
+Google Apps Script 에디터에서 `backend/Code.gs` 파일 9번째 줄의 `REGISTER_CODE`를 설정하세요:
 ```javascript
 // 9번째 줄
-const REGISTER_CODE = 'your_registration_code';  // config.js와 동일하게!
+const REGISTER_CODE = 'your_registration_code';
 ```
-
-> 💡 **중요**: 프론트엔드와 백엔드의 등록코드가 일치해야 합니다!
 
 ### 3️⃣ 배포
 
@@ -155,26 +144,32 @@ const REGISTER_CODE = 'your_registration_code';  // config.js와 동일하게!
 ## 📁 프로젝트 구조
 
 ```
-BigBrainAcademy-LC/
+bigbrain-tracker/
 ├── backend/
 │   └── Code.gs              # Google Apps Script (서버 로직)
-├── frontend/
+├── frontend/                # 개발용 소스 파일
 │   ├── index.html           # 사용자 페이지 (개발용)
-│   ├── admin.html           # 관리자 페이지 (개발용)
-│   ├── config.js            # 실제 설정 (gitignore)
-│   └── config.example.js    # 설정 예시 템플릿
-├── index.html               # 배포용 (Netlify/GitHub Pages)
-├── admin.html               # 배포용 (Netlify/GitHub Pages)
-├── config.js                # 배포용 설정 (gitignore)
-├── config.example.js        # 설정 예시 템플릿
-├── screenshots/             # 스크린샷
-├── .gitignore              # Git 제외 파일
-├── LICENSE                 # MIT 라이센스
-├── CONTRIBUTING.md         # 기여 가이드
-└── README.md               # 프로젝트 문서
+│   └── admin.html           # 관리자 페이지 (개발용)
+├── screenshots/             # README용 스크린샷
+├── index.html               # 배포용 사용자 페이지
+├── admin.html               # 배포용 관리자 페이지
+├── config.js                # 로컬 테스트용 설정 (gitignore됨)
+├── config.example.js        # 설정 템플릿 (환경 변수 예시)
+├── build.sh                 # Netlify 빌드 스크립트 (config.js 생성)
+├── netlify.toml             # Netlify 배포 설정
+├── .gitignore               # Git 제외 파일
+├── LICENSE                  # MIT 라이센스
+├── CONTRIBUTING.md          # 기여 가이드
+└── README.md                # 프로젝트 문서
 ```
 
-> 📝 **참고**: 루트에 있는 HTML 파일은 배포용입니다. `frontend/`의 파일을 수정한 후 루트로 복사하세요.
+### 파일 구조 설명
+
+- **`frontend/`**: 개발 시 수정하는 소스 파일들
+- **루트 HTML 파일들**: 배포용 (frontend에서 복사)
+- **`config.js`**: 로컬 테스트용 (Git에 올라가지 않음)
+- **`build.sh`**: Netlify가 환경 변수로부터 config.js를 자동 생성
+- **`netlify.toml`**: Netlify 빌드 설정 (환경 변수 사용)
 
 ---
 
@@ -254,28 +249,27 @@ generate30DayReport()   // 최근 30일
 - **이중 검증**: 프론트엔드와 백엔드 모두에서 등록코드 검증
 - 비밀번호는 Google Sheets에 평문 저장 (개인 스터디용)
 
-### 민감한 정보 관리
-- 민감한 설정은 `config.js`로 분리 (`.gitignore`에 포함)
-- `config.js`는 절대 GitHub에 푸시하지 마세요!
-- 등록코드는 스터디 그룹 멤버에게만 비공개로 공유
+### 민감한 정보 관리 (Netlify 환경 변수)
 
-```bash
-# ✅ GitHub에 올라가는 것
-- config.example.js (템플릿)
-- Code.gs (등록코드는 플레이스홀더 'YOUR_REGISTER_CODE_HERE')
+**Netlify 배포 시**:
+- ✅ 민감한 정보는 **Netlify 환경 변수**에 저장
+- ✅ GitHub에는 절대 올라가지 않음
+- ✅ `build.sh`가 빌드 타임에만 `config.js` 생성
+- ✅ Netlify Dashboard에서만 관리 가능
 
-# ❌ GitHub에 올라가지 않는 것
-- config.js (실제 등록코드, 비밀번호, URL 포함)
-```
+**GitHub에 올라가는 것**:
+- `config.example.js` - 템플릿만 (실제 값 없음)
+- `build.sh` - 빌드 스크립트 (환경 변수 사용)
+- `netlify.toml` - 빌드 설정 (환경 변수 이름만)
+- `Code.gs` - 플레이스홀더만 (`YOUR_REGISTER_CODE_HERE`)
 
-### 안전한 이유
-- `Code.gs`는 GitHub에 올라가지만, 등록코드가 `'YOUR_REGISTER_CODE_HERE'`로 되어 있음
-- 각 사용자가 Google Apps Script 에디터에서 직접 변경하므로 실제 코드는 노출되지 않음
-- `config.js`는 `.gitignore`에 포함되어 절대 GitHub에 올라가지 않음
+**GitHub에 올라가지 않는 것**:
+- `config.js` - 로컬 테스트용 (`.gitignore`에 포함)
+- 실제 등록코드, 비밀번호, URL - Netlify 환경 변수에만 존재
 
 ### 등록코드 관리 팁
-- 정기적으로 등록코드 변경 (스터디 시즌마다)
-- 외부 공개 금지 (카카오톡, 이메일로만 개별 공유)
+- 정기적으로 등록코드 변경 (Netlify Dashboard에서 쉽게 변경)
+- 외부 공개 금지 (스터디 멤버에게만 비공개 공유)
 - 탈퇴자 발생 시 등록코드 변경 권장
 
 > 💡 **프로덕션 사용 시**: 적절한 암호화 및 인증 시스템 추가 권장
