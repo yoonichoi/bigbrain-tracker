@@ -1,7 +1,9 @@
-# 🧠 BigBrain Academy - LeetCode Challenge Tracker
+# 🧠 말랑말랑 리트코드 - LeetCode Challenge Tracker
+(Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠올라서 붙인 이름입니다)
 
 매일 리트코드 문제를 풀고 인증하는 스터디 그룹을 위한 **간편한 체크인 시스템**입니다.  
-Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운영할 수 있습니다.
+Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운영할 수 있으며,
+약간의 수정을 통해 데일리 인증 챌린지를 수행하는 다양한 그룹이 사용 가능합니다.
 
 ![Main Screenshot](./screenshots/main.png)
 *사용자 인증 화면*
@@ -13,7 +15,7 @@ Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운�
 ### 👤 사용자 기능
 - **보안 회원가입**: 등록코드로 스터디 그룹만 가입 가능 🔐
 - **간편 등록**: 등록코드 + 이름 + 비밀번호로 즉시 가입
-- **일일 인증**: 날짜와 문제 번호를 입력하여 인증
+- **일일 인증**: 날짜와 문제 이름을 입력하여 인증
 - **실시간 통계**: 총 인증 횟수와 마지막 인증일 확인
 - **인증 히스토리**: 최근 10개 인증 기록 조회
 
@@ -38,9 +40,10 @@ Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운�
 ![Report Example](./screenshots/report.png)
 *주간 리포트 예시*
 
----
-
 ## 🚀 빠른 시작
+
+<details>
+<summary>📖 자세히 보기</summary>
 
 ### 1️⃣ Google Sheets 설정
 
@@ -65,7 +68,7 @@ Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운�
 cp config.example.js config.js
 ```
 
-그런 다음 `config.js`를 실제 값으로 수정:
+이후 `config.js`를 실제 값으로 수정:
 ```javascript
 const CONFIG = {
   SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
@@ -111,9 +114,11 @@ const REGISTER_CODE = 'your_registration_code';
    | 변수명 | 값 |
    |--------|-----|
    | `SCRIPT_URL` | Google Apps Script 배포 URL |
-   | `REGISTER_CODE` | 등록코드 (예: bigbrain2026) |
+   | `REGISTER_CODE` | 등록코드 |
    | `ADMIN_PASSWORD` | 관리자 비밀번호 |
    | `SHEET_URL` | 구글 시트 URL |
+   
+   이 환경 변수들은 빌드 시 `build.sh`에 의해 `config.js`로 변환됩니다.
 
 4. **배포 트리거**
    - **Deploys** 탭 > **Trigger deploy** > **Deploy site** 클릭
@@ -139,9 +144,16 @@ const REGISTER_CODE = 'your_registration_code';
 
 </details>
 
----
+</details>
 
-## 📁 프로젝트 구조
+
+
+## 📁 프로젝트 구조 및 기술 스택
+
+<details>
+<summary>📖 자세히 보기</summary>
+
+### 📁 프로젝트 구조
 
 ```
 bigbrain-tracker/
@@ -171,8 +183,6 @@ bigbrain-tracker/
 - **`build.sh`**: Netlify가 환경 변수로부터 config.js를 자동 생성
 - **`netlify.toml`**: Netlify 빌드 설정 (환경 변수 사용)
 
----
-
 ## 🛠 기술 스택
 
 - **Backend**: Google Apps Script (JavaScript)
@@ -187,9 +197,19 @@ bigbrain-tracker/
 ✅ **빠른 배포**: 5분 안에 시작 가능  
 ✅ **자동 배포**: Git push만 하면 자동으로 배포
 
----
+## 🌍 타임존 독립성
+
+이 시스템은 **타임존 독립적**으로 설계되었습니다:
+- 각 사용자가 자신의 로컬 타임존에서 날짜 선택
+- 날짜를 **문자열**(MM/DD)로 저장하여 타임존 이슈 방지
+- 한국/미국/유럽 어디서든 동일하게 작동
+
+</details>
 
 ## 📊 Google Sheets 데이터 구조
+
+<details>
+<summary>📖 자세히 보기</summary>
 
 배포 후 자동으로 3개의 시트가 생성됩니다:
 
@@ -207,8 +227,6 @@ bigbrain-tracker/
 | 사용자명 | 인증 횟수 | 인증 날짜들 | 누락 | 상태 |
 |---------|----------|-----------|------|------|
 | 홍길동 | 6 | 11/25, 11/26... | 1 | ✅ 통과 |
-
----
 
 ## ⚙️ 고급 설정
 
@@ -229,20 +247,14 @@ generate14DayReport()   // 최근 14일
 generate30DayReport()   // 최근 30일
 ```
 
-또는 관리자 대시보드에서 원하는 날짜 범위 선택
+또는 관리자 대시보드에서 원하는 날짜 범위 선택하여 커스텀리포트 생성 가능
 
----
-
-## 🌍 타임존 독립성
-
-이 시스템은 **타임존 독립적**으로 설계되었습니다:
-- 각 사용자가 자신의 로컬 타임존에서 날짜 선택
-- 날짜를 **문자열**(MM/DD)로 저장하여 타임존 이슈 방지
-- 한국/미국/유럽 어디서든 동일하게 작동
-
----
+</details>
 
 ## 🔒 보안
+
+<details>
+<summary>📖 자세히 보기</summary>
 
 ### 접근 제어
 - **등록코드**: 스터디 그룹 멤버만 가입 가능하도록 등록코드 필수 🔐
@@ -274,9 +286,12 @@ generate30DayReport()   // 최근 30일
 
 > 💡 **프로덕션 사용 시**: 적절한 암호화 및 인증 시스템 추가 권장
 
----
+</details>
 
 ## 📝 사용 시나리오
+
+<details>
+<summary>📖 자세히 보기</summary>
 
 ### 스터디 그룹 운영자
 1. 시스템 배포 (5분)
@@ -292,25 +307,19 @@ generate30DayReport()   // 최근 30일
 4. 본인 통계 확인
 5. 꾸준히 참여!
 
----
+</details>
 
 ## 🤝 기여
 
 버그 리포트나 기능 제안은 Issues에 등록해주세요!
 
----
-
 ## 📄 라이센스
 
 MIT License - 자유롭게 사용하세요!
 
----
-
 ## 📞 문의
 
 프로젝트 관련 문의나 질문은 Issues를 통해 남겨주세요.
-
----
 
 <div align="center">
 
