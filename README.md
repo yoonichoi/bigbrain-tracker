@@ -5,6 +5,8 @@
 Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료로 운영할 수 있으며,
 약간만 수정하면 리트코드 외에도 다양한 데일리 인증 챌린지에 맞춰 여러 그룹에서 쉽게 활용할 수 있습니다.
 
+🌐 말랑말랑 리트코드 [[유저용]](https://bigbrainlc.netlify.app/) [[관리자용]](https://bigbrainlc.netlify.app/admin.html)
+
 ![Main Screenshot](./screenshots/main.png)
 *사용자 인증 화면*
 
@@ -127,8 +129,7 @@ const REGISTER_CODE = 'your_registration_code';
 5. **완료!**
    - `https://your-site-name.netlify.app` 에서 확인
    - 환경 변수는 안전하게 관리되며 GitHub에 노출되지 않음 ✅
-
-> 💡 **왜 Netlify?**: 자동 배포, 빠른 속도, 무료, 민감 정보 관리 쉬움
+   - 관리자 페이지: `https://your-site-name.netlify.app/admin.html`
 
 #### GitHub Pages로 배포 (선택사항)
 
