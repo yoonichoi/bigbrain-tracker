@@ -1,9 +1,9 @@
 # 🧠 말랑말랑 리트코드 - LeetCode Challenge Tracker
-(Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠올라서 붙인 이름입니다)
+~~(Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠올라서 붙인 이름입니다)~~
 
 매일 리트코드 문제를 풀고 인증하는 스터디 그룹을 위한 **간편한 체크인 시스템**입니다.  
-Google Apps Script + Google Sheets를 활용하여 서버 없이 무료로 운영할 수 있으며,
-약간의 수정을 통해 데일리 인증 챌린지를 수행하는 다양한 그룹이 사용 가능합니다.
+Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료로 운영할 수 있으며,
+약간만 수정하면 리트코드 외에도 다양한 데일리 인증 챌린지에 맞춰 여러 그룹에서 쉽게 활용할 수 있습니다.
 
 ![Main Screenshot](./screenshots/main.png)
 *사용자 인증 화면*
@@ -189,13 +189,6 @@ bigbrain-tracker/
 - **Database**: Google Sheets
 - **Frontend**: Vanilla HTML/CSS/JavaScript
 - **Hosting**: Netlify (권장)
-
-### 왜 이 스택?
-✅ **완전 무료**: Google Sheets API + Netlify 무료  
-✅ **서버 불필요**: Apps Script가 서버 역할  
-✅ **쉬운 관리**: 구글 시트에서 데이터 직접 확인  
-✅ **빠른 배포**: 5분 안에 시작 가능  
-✅ **자동 배포**: Git push만 하면 자동으로 배포
 
 ## 🌍 타임존 독립성
 
