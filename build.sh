@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Netlify 환경 변수로부터 config.js 생성
-cat > config.js << EOF
+# Netlify 환경 변수로부터 frontend/config.js 생성
+cat > frontend/config.js << EOF
 // 자동 생성된 설정 파일 (Netlify 빌드 시)
 const CONFIG = {
   SCRIPT_URL: '${SCRIPT_URL}',

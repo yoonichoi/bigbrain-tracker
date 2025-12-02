@@ -160,15 +160,13 @@ const REGISTER_CODE = 'your_registration_code';
 bigbrain-tracker/
 ├── backend/
 │   └── Code.gs              # Google Apps Script (서버 로직)
-├── frontend/                # 개발용 소스 파일
-│   ├── index.html           # 사용자 페이지 (개발용)
-│   └── admin.html           # 관리자 페이지 (개발용)
+├── frontend/                # 배포 디렉토리 (Netlify가 이 폴더를 배포)
+│   ├── index.html           # 사용자 페이지
+│   ├── admin.html           # 관리자 페이지
+│   └── config.js            # 빌드 시 자동 생성 (gitignore됨)
 ├── screenshots/             # README용 스크린샷
-├── index.html               # 배포용 사용자 페이지
-├── admin.html               # 배포용 관리자 페이지
-├── config.js                # 로컬 테스트용 설정 (gitignore됨)
 ├── config.example.js        # 설정 템플릿 (환경 변수 예시)
-├── build.sh                 # Netlify 빌드 스크립트 (config.js 생성)
+├── build.sh                 # Netlify 빌드 스크립트 (frontend/config.js 생성)
 ├── netlify.toml             # Netlify 배포 설정
 ├── .gitignore               # Git 제외 파일
 ├── LICENSE                  # MIT 라이센스
@@ -178,10 +176,11 @@ bigbrain-tracker/
 
 ### 파일 구조 설명
 
-- **`frontend/`**: 개발 시 수정하는 소스 파일들
-- **루트 HTML 파일들**: 배포용 (frontend에서 복사)
-- **`config.js`**: 로컬 테스트용 (Git에 올라가지 않음)
-- **`build.sh`**: Netlify가 환경 변수로부터 config.js를 자동 생성
+- **`frontend/`**: 
+  - 소스 파일이 있는 디렉토리
+  - Netlify가 이 폴더를 배포 (`publish = "frontend"`)
+  - 빌드 시 `config.js`가 자동 생성됨
+- **`build.sh`**: Netlify 빌드 시 환경 변수로부터 `frontend/config.js` 자동 생성
 - **`netlify.toml`**: Netlify 빌드 설정 (환경 변수 사용)
 
 ## 🛠 기술 스택

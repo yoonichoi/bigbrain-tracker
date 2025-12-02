@@ -43,8 +43,8 @@ Desktop.ini
 .env.local
 .env.*.local
 
-# Configuration with sensitive data (로컬 테스트용)
-config.js
+# Configuration with sensitive data
+frontend/config.js
 
 # Logs
 logs
