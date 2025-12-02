@@ -1,4 +1,4 @@
-# 🧠 말랑말랑 리트코드 - LeetCode Challenge Tracker
+# 🧠 말랑말랑 리트코드 - Big Brain LeetCode Challenge Tracker
 ~~(Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠오르길래!)~~
 
 매일 리트코드 문제를 풀고 인증하는 스터디 그룹을 위한 **간편한 체크인 시스템**입니다.  
@@ -320,7 +320,15 @@ MIT License - 자유롭게 사용하세요!
 
 **⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!**
 
+---
+
+### 👨‍💻 만든 사람
+
+**Yooni Choi** ([@yoonichoi](https://github.com/yoonichoi))
+
 Made with ❤️ for LeetCode enthusiasts
+
+Copyright © 2025 Yooni Choi. All rights reserved.
 
 </div>
 

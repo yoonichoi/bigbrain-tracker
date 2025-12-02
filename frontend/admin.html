@@ -1,3 +1,14 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  🧠 말랑말랑 리트코드 - 관리자 대시보드                                      ║
+║                                                                              ║
+║  Copyright (c) 2025 Yooni Choi                                              ║
+║  Licensed under MIT License                                                 ║
+║                                                                              ║
+║  이 소프트웨어는 MIT 라이센스 하에 배포됩니다.                               ║
+║  수정 및 배포 시 원저작자 표시를 유지해주세요.                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -164,6 +175,25 @@
             text-align: center;
             padding: 40px;
             color: #666;
+        }
+        
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -529,6 +559,29 @@
                 successMsg.style.display = 'none';
             }, 3000);
         }
+        
+        // 개발자 콘솔에 저작권 표시
+        (function() {
+            const styles = [
+                'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'color: white',
+                'font-size: 16px',
+                'font-weight: bold',
+                'padding: 15px 30px',
+                'border-radius: 5px'
+            ].join(';');
+            
+            console.log('%c🧠 말랑말랑 리트코드 - 관리자 대시보드', styles);
+            console.log('%cCopyright (c) 2025 Yooni Choi', 'font-size: 12px; color: #667eea;');
+            console.log('%cMIT License - https://github.com/yoonichoi', 'font-size: 11px; color: #999;');
+            console.log('%c이 소프트웨어를 수정/배포 시 원저작자 표시를 유지해주세요.', 'font-size: 11px; color: #666;');
+        })();
     </script>
+    
+    <!-- Footer: 저작권 표시 -->
+    <div class="footer">
+        Made with ❤️ by <a href="https://github.com/yoonichoi" target="_blank">Yooni Choi</a> © 2025 | 
+        <a href="https://github.com/yoonichoi/bigbrain-tracker" target="_blank">GitHub</a>
+    </div>
 </body>
 </html>
