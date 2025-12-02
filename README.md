@@ -20,9 +20,11 @@ Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료�
 - **실시간 통계**: 총 인증 횟수와 마지막 인증일 확인
 - **인증 히스토리**: 최근 10개 인증 기록 조회
 
-<img src="./screenshots/checkin.png" alt="Main Screenshot" width="300"/>
-<img src="./screenshots/checkin2.png" alt="Main Screenshot" width="300"/>
-<img src="./screenshots/mystat.png" alt="Main Screenshot" width="300"/>
+<p align="center">
+  <img src="./screenshots/checkin.png" alt="Main Screenshot" width="300"/>
+  <img src="./screenshots/checkin2.png" alt="Main Screenshot" width="300"/>
+  <img src="./screenshots/mystat.png" alt="Main Screenshot" width="300"/>
+</p>
 
 ### 🔐 관리자 대시보드
 - **실시간 통계**: 전체 사용자, 전체/오늘 인증, 탈락 위험자 수
