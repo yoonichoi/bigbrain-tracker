@@ -953,25 +953,20 @@ function getAdminStats() {
   const totalUsers = userSheet ? userSheet.getLastRow() - 1 : 0;
   const totalCheckins = recordSheet ? recordSheet.getLastRow() - 1 : 0;
   
-  // 오늘 인증 수
-  let todayCheckins = 0;
+  // 모든 인증 기록의 날짜 반환 (프론트엔드에서 "오늘" 인증 수 계산)
+  let allDates = [];
   if (recordSheet && recordSheet.getLastRow() > 1) {
-    const today = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
-    const todayStr = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-    
     const records = recordSheet.getRange(2, 1, recordSheet.getLastRow() - 1, 4).getValues();
-    todayCheckins = records.filter(row => {
-      let dateStr;
+    allDates = records.map(row => {
       const dateRaw = row[1];
       if (dateRaw instanceof Date) {
         const month = String(dateRaw.getMonth() + 1).padStart(2, '0');
         const day = String(dateRaw.getDate()).padStart(2, '0');
-        dateStr = month + '/' + day;
+        return month + '/' + day;
       } else {
-        dateStr = String(dateRaw).replace(/^'/, '');
+        return String(dateRaw).replace(/^'/, '');
       }
-      return dateStr === todayStr;
-    }).length;
+    });
   }
   
   // 탈락 위험자 수 (주간리포트 기반)
@@ -985,7 +980,7 @@ function getAdminStats() {
   return ContentService.createTextOutput(JSON.stringify({
     totalUsers,
     totalCheckins,
-    todayCheckins,
+    allDates,
     dropoutCount
   })).setMimeType(ContentService.MimeType.JSON);
 }

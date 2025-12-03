@@ -350,9 +350,23 @@
                 const response = await fetch(SCRIPT_URL + '?action=getStats');
                 const stats = await response.json();
                 
+                // 관리자의 로컬 타임존 기준 오늘 날짜 계산
+                const today = new Date();
+                const todayStr = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+                
+                // 오늘 날짜와 일치하는 인증 수 카운트
+                const todayCheckins = stats.allDates ? stats.allDates.filter(date => date === todayStr).length : 0;
+                
                 document.getElementById('total-users').textContent = stats.totalUsers || 0;
                 document.getElementById('total-checkins').textContent = stats.totalCheckins || 0;
-                document.getElementById('today-checkins').textContent = stats.todayCheckins || 0;
+                document.getElementById('today-checkins').textContent = todayCheckins;
+                
+                // "오늘 인증" 라벨에 관리자 기준 날짜 표시
+                const todayLabel = document.querySelector('#today-checkins + .stat-label');
+                if (todayLabel) {
+                    todayLabel.textContent = `오늘 인증 (${todayStr})`;
+                }
+                
                 document.getElementById('dropout-count').textContent = stats.dropoutCount || 0;
             } catch (error) {
                 console.error('통계 로드 실패:', error);

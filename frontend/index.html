@@ -400,8 +400,8 @@
         // ⭐ Google Apps Script URL (config.js에서 로드됨)
         const SCRIPT_URL = CONFIG.SCRIPT_URL;
         
-        // 오늘 날짜 자동 계산 (미국 EST 기준)
-        const today = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+        // 오늘 날짜 자동 계산 (사용자의 로컬 타임존 기준)
+        const today = new Date();
         
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
