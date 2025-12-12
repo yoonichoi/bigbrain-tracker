@@ -45,7 +45,6 @@ Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료�
 - **구글 시트 연동**: 원본 데이터 바로 확인
 
 ![Admin Dashboard](./screenshots/admin-dashboard.png)
-*관리자 대시보드*
 
 ### 📊 자동 리포트
 - **주간 리포트**: 매주 자동 생성 (스케줄 설정 가능)
