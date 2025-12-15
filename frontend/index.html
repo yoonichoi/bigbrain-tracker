@@ -400,6 +400,9 @@
         // ⭐ Google Apps Script URL (config.js에서 로드됨)
         const SCRIPT_URL = CONFIG.SCRIPT_URL;
         
+        // 리로드 타이머 (탭 전환 시 취소하기 위해)
+        let reloadTimer = null;
+        
         // 오늘 날짜 자동 계산 (사용자의 로컬 타임존 기준)
         const today = new Date();
         
@@ -411,9 +414,24 @@
         
         // 탭 전환
         function switchTab(tabName) {
-            // 모든 탭과 페이지의 active 클래스 제거
+            // 리로드 타이머가 있으면 취소
+            if (reloadTimer) {
+                clearTimeout(reloadTimer);
+                reloadTimer = null;
+            }
+            
+            // 성공 화면 숨기기
+            const successDiv = document.getElementById('success-container');
+            successDiv.style.display = 'none';
+            
+            // 모든 페이지를 다시 보이게 설정
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'block';
+                page.classList.remove('active');
+            });
+            
+            // 모든 탭의 active 클래스 제거
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             
             // tabName에 해당하는 탭 찾아서 active 추가
             const tabs = document.querySelectorAll('.tab');
@@ -524,7 +542,7 @@
                     registerBtn.textContent = '등록하기';
                 } else if (result.status === 'success') {
                     showSuccess('등록 완료!', `${username}님, 환영합니다!<br><br>이제 인증 탭에서 매일 인증하세요! 🎉<br><br><small style="color: #999;">3초 후 자동으로 이동합니다...</small>`);
-                    setTimeout(() => {
+                    reloadTimer = setTimeout(() => {
                         location.reload();
                     }, 3000);
                 } else {
@@ -597,7 +615,7 @@
                     checkinBtn.textContent = '✅ 인증 완료';
                 } else if (result.status === 'success') {
                     showSuccess('인증 완료!', `${username}님의 ${dateStr} 인증이 완료되었습니다!<br><br>총 <strong>${result.totalCount}일</strong> 인증 완료 🎉`);
-                    setTimeout(() => {
+                    reloadTimer = setTimeout(() => {
                         location.reload();
                     }, 3000);
                 } else {
