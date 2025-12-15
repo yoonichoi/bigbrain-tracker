@@ -424,9 +424,10 @@
             const successDiv = document.getElementById('success-container');
             successDiv.style.display = 'none';
             
-            // 모든 페이지의 active 클래스 제거 (CSS가 display 관리)
+            // 모든 페이지의 active 클래스 제거 및 inline style 제거
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
+                page.style.display = ''; // inline style 제거해서 CSS가 작동하도록
             });
             
             // 모든 탭의 active 클래스 제거
