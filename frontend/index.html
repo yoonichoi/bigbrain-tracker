@@ -411,10 +411,18 @@
         
         // 탭 전환
         function switchTab(tabName) {
+            // 모든 탭과 페이지의 active 클래스 제거
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             
-            event.currentTarget.classList.add('active');
+            // tabName에 해당하는 탭 찾아서 active 추가
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndex = { 'register': 0, 'checkin': 1, 'history': 2 };
+            if (tabIndex[tabName] !== undefined) {
+                tabs[tabIndex[tabName]].classList.add('active');
+            }
+            
+            // 해당 페이지 활성화
             document.getElementById(tabName + '-page').classList.add('active');
             
             if (tabName === 'history') {
