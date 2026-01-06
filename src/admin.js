@@ -212,9 +212,10 @@ async function loadWeeklyReport() {
 
 // 날짜 포맷 (YYYY-MM-DD -> MM/DD)
 function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
+  // 타임존 이슈 방지: UTC로 파싱
+  const date = new Date(dateStr + 'T00:00:00Z')
+  const month = (date.getUTCMonth() + 1).toString()
+  const day = date.getUTCDate().toString()
   return `${month}/${day}`
 }
 
