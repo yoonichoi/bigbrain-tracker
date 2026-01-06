@@ -85,13 +85,17 @@ function switchTab(tabName) {
   // 페이지 전환
   document.querySelectorAll('.page').forEach(page => {
     page.classList.remove('active')
+    page.style.display = 'none' // 명시적으로 숨기기
   })
   
   document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.remove('active')
   })
   
-  document.getElementById(`${tabName}-page`).classList.add('active')
+  const targetPage = document.getElementById(`${tabName}-page`)
+  targetPage.style.display = 'block' // 명시적으로 보이기
+  targetPage.classList.add('active')
+  
   document.querySelector(`[data-tab="${tabName}"]`).classList.add('active')
   
   // 내 기록 탭이면 사용자 목록 로드
@@ -296,7 +300,7 @@ async function loadMyHistory() {
         // 문제 이름 처리: 없거나 "미입력"이면 회색으로 표시
         const problemName = (item.problem && item.problem !== '미입력') 
           ? item.problem 
-          : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+          : '<span style="color: #999; font-style: italic;">미입력</span>'
         
         return `
           <div class="history-item" id="history-item-${index}" data-date="${item.date}" data-problem="${item.problem || ''}" data-timestamp="${item.timestamp}">
@@ -374,7 +378,7 @@ window.cancelEdit = function(index) {
   // 원래 표시로 복원
   const displayText = (currentProblem && currentProblem !== '미입력')
     ? currentProblem
-    : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+    : '<span style="color: #999; font-style: italic;">미입력</span>'
   
   problemText.innerHTML = displayText
   
@@ -429,7 +433,7 @@ window.saveProblem = async function(index) {
       // 표시 업데이트
       const displayText = newProblem
         ? newProblem
-        : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+        : '<span style="color: #999; font-style: italic;">미입력</span>'
       
       document.getElementById(`problem-text-${index}`).innerHTML = displayText
       
