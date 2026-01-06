@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/cover.png" alt="말랑말랑 리트코드" width="600" />
+</div>
+
 # 🧠 BigBrain LeetCode Tracker
 
 A modern, collaborative LeetCode challenge tracking system built with Supabase, Vite, and Vercel.
