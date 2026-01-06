@@ -62,7 +62,10 @@
             <div class="section">
                 <div class="section-header" onclick="toggleWeeklyReport()">
                     <h2>📊 주간 리포트 <span id="report-week-range"></span></h2>
-                    <button class="expand-btn" id="expand-btn">▼</button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="generate-report-btn" onclick="generateReport(event)" title="수동으로 주간 리포트 생성">🔄 리포트 생성</button>
+                        <button class="expand-btn" id="expand-btn">▼</button>
+                    </div>
                 </div>
                 
                 <div id="weekly-report-content" style="display: none;">

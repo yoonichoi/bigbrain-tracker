@@ -123,6 +123,45 @@ window.toggleWeeklyReport = async function() {
   }
 }
 
+// 수동으로 주간 리포트 생성
+window.generateReport = async function(e) {
+  e.stopPropagation() // 토글 방지
+  
+  if (!confirm('주간 리포트를 수동으로 생성하시겠습니까?\n\n현재 주의 데이터로 리포트가 생성됩니다.')) {
+    return
+  }
+  
+  const btn = e.target
+  const originalText = btn.textContent
+  
+  btn.disabled = true
+  btn.textContent = '⏳ 생성 중...'
+  
+  try {
+    const result = await API.generateWeeklyReportManually()
+    
+    if (result.status === 'success') {
+      alert('✅ 주간 리포트가 생성되었습니다!')
+      
+      // 리포트 새로고침
+      weeklyReportLoaded = false
+      const content = document.getElementById('weekly-report-content')
+      if (content.style.display !== 'none') {
+        await loadWeeklyReport()
+        weeklyReportLoaded = true
+      }
+    } else {
+      throw new Error(result.message)
+    }
+  } catch (error) {
+    console.error('Error generating report:', error)
+    alert('❌ 리포트 생성 실패!\n\n' + error.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = originalText
+  }
+}
+
 // ========================================
 // Weekly Report
 // ========================================

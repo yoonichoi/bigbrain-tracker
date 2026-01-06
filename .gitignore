@@ -60,6 +60,7 @@ node_modules/
 # Build output
 dist/
 dist-ssr/
+.vite/
 
 # Local dev files
 config.local.js
