@@ -29,7 +29,8 @@ function doGet(e) {
     return getRegisteredUsers();
   } else if (action === 'stats') {
     const username = e.parameter.username;
-    return getUserStats(username);
+    const password = e.parameter.password;
+    return getUserStats(username, password);
   } else if (action === 'getStats') {
     return getAdminStats();
   } else if (action === 'getUsersWithStats') {
@@ -53,6 +54,8 @@ function doPost(e) {
       return handleDeleteUser(e);
     } else if (action === 'generateCustomReport') {
       return handleGenerateCustomReport(e);
+    } else if (action === 'updateProblem') {
+      return handleUpdateProblem(e);
     }
     
     return ContentService.createTextOutput(JSON.stringify({
@@ -303,7 +306,18 @@ function verifyUser(username, password) {
 // 통계
 // ========================================
 
-function getUserStats(username) {
+function getUserStats(username, password) {
+  // 비밀번호 확인
+  if (password) {
+    const isValid = verifyUser(username, password);
+    if (!isValid) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'unauthorized',
+        message: '비밀번호가 틀렸습니다'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("인증기록");
   
   if (!sheet || sheet.getLastRow() <= 1) {
@@ -355,7 +369,8 @@ function getUserStats(username) {
       
       return {
         date: dateStr,
-        problem: row[3] || '미입력'
+        problem: row[3] || '미입력',
+        timestamp: row[0]  // 수정용 타임스탬프 추가
       };
     });
   
@@ -364,6 +379,88 @@ function getUserStats(username) {
     lastDate: lastDate,
     history: recentHistory
   })).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ========================================
+// 문제 이름 수정
+// ========================================
+
+function handleUpdateProblem(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    
+    Logger.log('=== 문제 이름 수정 시작 ===');
+    Logger.log('Username: ' + data.username);
+    Logger.log('Date: ' + data.date);
+    Logger.log('Timestamp: ' + data.timestamp);
+    Logger.log('New Problem: ' + data.newProblem);
+    
+    // 1. 사용자 인증 (비밀번호 확인)
+    const isValid = verifyUser(data.username, data.password);
+    
+    if (!isValid) {
+      Logger.log('❌ 비밀번호 틀림');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "unauthorized",
+        message: "비밀번호가 틀렸습니다"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    Logger.log('✅ 비밀번호 인증 통과');
+    
+    // 2. 인증기록 시트에서 해당 기록 찾기
+    const recordSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("인증기록");
+    
+    if (!recordSheet || recordSheet.getLastRow() <= 1) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: "인증 기록이 없습니다"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const allData = recordSheet.getRange(2, 1, recordSheet.getLastRow() - 1, 4).getValues();
+    
+    // 타임스탬프와 사용자명으로 정확한 기록 찾기
+    let foundRow = -1;
+    for (let i = 0; i < allData.length; i++) {
+      const rowTimestamp = new Date(allData[i][0]).getTime();
+      const searchTimestamp = new Date(data.timestamp).getTime();
+      const rowUsername = String(allData[i][2]).trim();
+      
+      // 타임스탬프와 사용자명이 모두 일치하는 행 찾기
+      if (rowTimestamp === searchTimestamp && rowUsername === data.username) {
+        foundRow = i + 2; // 시트의 실제 행 번호 (헤더 제외)
+        break;
+      }
+    }
+    
+    if (foundRow === -1) {
+      Logger.log('❌ 기록을 찾을 수 없음');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: "기록을 찾을 수 없습니다"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    Logger.log('✅ 기록 발견 (행 번호: ' + foundRow + ')');
+    
+    // 3. 문제 이름 업데이트
+    recordSheet.getRange(foundRow, 4).setValue(data.newProblem);
+    
+    Logger.log('✅ 문제 이름 업데이트 완료');
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      message: "문제 이름이 수정되었습니다"
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    Logger.log('❌ 에러 발생: ' + error.toString());
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // ========================================

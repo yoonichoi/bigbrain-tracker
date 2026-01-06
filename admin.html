@@ -1,0 +1,89 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  🧠 말랑말랑 리트코드 - 관리자 대시보드                                      ║
+║                                                                              ║
+║  Copyright (c) 2025 Yooni Choi                                              ║
+║  Licensed under MIT License                                                 ║
+║                                                                              ║
+║  이 소프트웨어는 MIT 라이센스 하에 배포됩니다.                               ║
+║  수정 및 배포 시 원저작자 표시를 유지해주세요.                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말랑말랑 대시보드</title>
+    <link rel="stylesheet" href="/src/admin-style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 말랑말랑 리트코드 관리자 대시보드</h1>
+        
+        <!-- 전체 통계 -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">총 사용자 수</div>
+                <div class="stat-value" id="total-users">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">총 인증 수</div>
+                <div class="stat-value" id="total-checkins">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">오늘 인증</div>
+                <div class="stat-value" id="today-checkins">0</div>
+            </div>
+        </div>
+        
+        <!-- 사용자 목록 -->
+        <div class="section">
+            <h2>📋 사용자 목록</h2>
+            <div class="table-container">
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>인증 횟수</th>
+                            <th>최근 인증</th>
+                            <th>등록일</th>
+                            <th>액션</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="5">로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 최근 인증 기록 -->
+        <div class="section">
+            <h2>📜 최근 인증 기록 (20개)</h2>
+            <div class="table-container">
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>이름</th>
+                            <th>문제</th>
+                            <th>시간</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody">
+                        <tr><td colspan="4">로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Made with ❤️ by <a href="https://github.com/yoonichoi" target="_blank">Yooni Choi</a> © 2025
+    </div>
+    
+    <script type="module" src="/src/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,146 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  🧠 말랑말랑 리트코드 (Big Brain LeetCode Challenge Tracker)                           ║
+║                                                                              ║
+║  Copyright (c) 2025 Yooni Choi                                              ║
+║  Licensed under MIT License                                                 ║
+║                                                                              ║
+║  이 소프트웨어는 MIT 라이센스 하에 배포됩니다.                               ║
+║  수정 및 배포 시 원저작자 표시를 유지해주세요.                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말랑말랑 리트코드</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="icon">💻</div>
+        <h1>말랑말랑 리트코드</h1>
+        
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <div class="tab" data-tab="register">👤 등록</div>
+            <div class="tab active" data-tab="checkin">✅ 인증</div>
+            <div class="tab" data-tab="history">📜 내 기록</div>
+        </div>
+        
+        <!-- 등록 페이지 -->
+        <div id="register-page" class="page">
+            <h2>신규 등록</h2>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label>등록코드 🔑</label>
+                    <input type="password" id="register-code" placeholder="등록코드를 입력하세요" required autofocus>
+                    <small style="color: #999; font-size: 0.85em; display: block; margin-top: 5px;">
+                        관리자에게 등록코드를 받으세요
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="register-username" placeholder="홍길동" required>
+                    <small style="color: #999; font-size: 0.85em; display: block; margin-top: 5px;">
+                        카톡방에서 사용중인 닉네임으로 입력해주세요
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>비밀번호 (4자리 숫자)</label>
+                    <input type="password" id="register-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
+                </div>
+                
+                <button type="submit" id="register-btn">등록하기</button>
+                <div class="error" id="register-error"></div>
+            </form>
+        </div>
+        
+        <!-- 인증 페이지 -->
+        <div id="checkin-page" class="page active">
+            <h2>매일 인증</h2>
+            <div class="date" id="today-date"></div>
+            
+            <form id="checkin-form">
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="checkin-username" list="username-list" placeholder="이름 입력..." autocomplete="off" required>
+                    <datalist id="username-list"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label>비밀번호 (4자리)</label>
+                    <input type="password" id="checkin-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>문제 이름 (선택)</label>
+                    <input type="text" id="problem" placeholder="Two Sum">
+                </div>
+                
+                <button type="submit" id="checkin-btn">✅ 인증 완료</button>
+                <div class="error" id="checkin-error"></div>
+            </form>
+        </div>
+        
+        <!-- 내 기록 페이지 -->
+        <div id="history-page" class="page">
+            <h2>📜 내 인증 기록</h2>
+            
+            <div class="form-group">
+                <label>이름 입력</label>
+                <input type="text" id="history-username" list="history-username-list" placeholder="이름 입력..." autocomplete="off">
+                <datalist id="history-username-list"></datalist>
+            </div>
+            
+            <div class="form-group">
+                <label>비밀번호 (4자리)</label>
+                <input type="password" id="history-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
+            </div>
+            
+            <button id="load-history-btn">🔍 내 기록 보기</button>
+            
+            <div id="my-stats" style="display: none; margin-top: 30px;">
+                <div class="stats-card">
+                    <h3 style="color: white; margin-bottom: 10px;">통계</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">총 인증 횟수</div>
+                            <div class="stat-value" id="my-total-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">최근 인증</div>
+                            <div class="stat-value" style="font-size: 1.5em;" id="my-last-date">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="color: #555; margin-bottom: 15px; font-size: 1em;">최근 10개 기록</h3>
+                <div id="my-history-list"></div>
+            </div>
+            
+            <div class="error" id="history-error" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- 성공 화면 -->
+        <div class="success" id="success-container">
+            <div class="success-icon">✅</div>
+            <h2>완료!</h2>
+            <p id="success-message"></p>
+        </div>
+    </div>
+    
+    <!-- Footer: 저작권 표시 -->
+    <div class="footer">
+        Made with ❤️ by <a href="https://github.com/yoonichoi" target="_blank">Yooni Choi</a> © 2025 | 
+        <a href="https://github.com/yoonichoi/bigbrain-tracker" target="_blank">GitHub</a>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+

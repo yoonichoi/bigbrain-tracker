@@ -1,344 +1,261 @@
-# 🧠 말랑말랑 리트코드 - Big Brain LeetCode Challenge Tracker
+# 🧠 말랑말랑 리트코드 (Big Brain LeetCode Challenge Tracker)
 
-<div align="center">
+매일 리트코드 문제를 풀고 인증하는 챌린지 트래커입니다. Supabase + Vite + Vercel로 구축된 모던 웹 앱입니다.
 
-**[🇰🇷 한국어](README.md) | [🇺🇸 English](README_EN.md)**
-
-</div>
-
-<p align="center"><sub><i>Cursor와 함께 개발하는 내내 닌텐도 게임 말랑말랑 두뇌교실이 떠오르길래!</i></sub></p>
-<p align="center">
-  <img src="./screenshots/BigBrain.png" alt="Main Screenshot" width="600"/>
-</p>
-
-
-매일 리트코드 문제를 풀고 인증하는 스터디 그룹을 위한 **간편한 체크인 시스템**입니다.  
-Google Apps Script와 Google Sheets를 활용해 별도의 서버 없이 무료로 운영할 수 있으며,
-약간만 수정하면 리트코드 외에도 다양한 데일리 인증 챌린지에 맞춰 여러 그룹에서 쉽게 활용할 수 있습니다.
-
-🌐 말랑말랑 리트코드 [[유저용]](https://bigbrainlc.netlify.app/) [[관리자용]](https://bigbrainlc.netlify.app/admin.html)
-
-<img src="./screenshots/register.png" alt="Main Screenshot" width="400"/>
-
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ 주요 기능
 
-### 👤 사용자 기능
-- **보안 회원가입**: 등록코드로 스터디 그룹만 가입 가능 🔐
-- **간편 등록**: 등록코드 + 이름 + 비밀번호로 즉시 가입
-- **일일 인증**: 날짜와 문제 이름을 입력하여 인증
-- **실시간 통계**: 총 인증 횟수와 마지막 인증일 확인
-- **인증 히스토리**: 최근 10개 인증 기록 조회
+- 👤 **사용자 등록**: 등록코드로 간편하게 가입
+- ✅ **매일 인증**: 리트코드 문제 풀고 인증
+- 📊 **통계 확인**: 개인 인증 기록 및 통계 조회
+- 📝 **문제 이름 수정**: 인증 후 문제 이름 변경 가능
+- 🔒 **비밀번호 보호**: 내 기록은 비밀번호로 보호
+- 👨‍💼 **관리자 대시보드**: 전체 통계 및 사용자 관리
 
-<p align="center">
-  <img src="./screenshots/checkin.png" alt="Main Screenshot" width="300"/>
-  <img src="./screenshots/checkin2.png" alt="Main Screenshot" width="300"/>
-  <img src="./screenshots/mystat.png" alt="Main Screenshot" width="300"/>
-</p>
+## 🚀 기술 스택
 
-### 🔐 관리자 대시보드
-- **실시간 통계**: 전체 사용자, 전체/오늘 인증, 탈락 위험자 수
-- **사용자 관리**: 전체 사용자 목록 및 삭제 기능
-- **최근 활동**: 최근 20개 인증 기록 실시간 확인
-- **커스텀 리포트**: 원하는 날짜 범위의 리포트 생성
-- **구글 시트 연동**: 원본 데이터 바로 확인
+### Frontend
+- **Vite** - 빠른 개발 서버 및 빌드 도구
+- **Vanilla JS** - 프레임워크 없는 순수 JavaScript
+- **CSS3** - 모던하고 반응형 UI
 
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+### Backend
+- **Supabase** - PostgreSQL 기반 BaaS
+- **Row Level Security** - 데이터 보안
 
-### 📊 자동 리포트
-- **주간 리포트**: 매주 자동 생성 (스케줄 설정 가능)
-- **탈락자 추적**: 2일 이상 누락 시 자동 표시
-- **커스텀 기간 리포트**: 3일/7일/14일/30일 또는 원하는 기간 설정
+### Deployment
+- **Vercel** - 자동 배포 및 호스팅
+- **Edge Network** - 빠른 전 세계 접근
 
-![Report Example](./screenshots/report.png)
-*주간 리포트 예시*
+## 📦 설치 및 실행
 
-## 🚀 빠른 시작
-
-<details>
-<summary>📖 자세히 보기</summary>
-
-### 1️⃣ Google Sheets 설정
-
-1. [Google Sheets](https://sheets.google.com) 새 스프레드시트 생성
-2. **확장 프로그램** > **Apps Script** 클릭
-3. `backend/Code.gs` 내용 전체 복사 & 붙여넣기
-4. **⚠️ 중요: 9번째 줄의 등록코드를 변경하세요!**
-   ```javascript
-   const REGISTER_CODE = 'YOUR_REGISTER_CODE_HERE';  // 원하는 코드로 변경!
-   ```
-5. **저장** 후 **배포** > **새 배포**
-   - 유형: **웹 앱**
-   - 액세스 권한: **모든 사용자**
-6. 배포 URL 복사 (예: `https://script.google.com/macros/s/ABC.../exec`)
-
-### 2️⃣ 로컬 테스트 설정 (선택사항)
-
-로컬에서 테스트하려면 `config.js` 파일을 생성하세요:
+### 1️⃣ 클론
 
 ```bash
-# 프로젝트 루트에서
-cp config.example.js config.js
+git clone https://github.com/yoonichoi/bigbrain-tracker.git
+cd bigbrain-tracker
 ```
 
-이후 `config.js`를 실제 값으로 수정:
-```javascript
-const CONFIG = {
-  SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
-  REGISTER_CODE: 'your_registration_code',
-  ADMIN_PASSWORD: 'your_secure_password',
-  SHEET_URL: 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit'
-};
+### 2️⃣ 의존성 설치
+
+```bash
+npm install
 ```
 
-> 💡 **참고**: 
-> - 로컬 테스트용입니다 (`.gitignore`에 포함됨)
-> - Netlify 배포 시에는 환경 변수를 사용하므로 이 파일이 필요 없습니다
+### 3️⃣ Supabase 설정
 
-#### 백엔드 등록코드 설정
-Google Apps Script 에디터에서 `backend/Code.gs` 파일 9번째 줄의 `REGISTER_CODE`를 설정하세요:
-```javascript
-// 9번째 줄
-const REGISTER_CODE = 'your_registration_code';
+자세한 내용은 [`supabase/SETUP.md`](./supabase/SETUP.md) 참조
+
+1. [Supabase](https://supabase.com)에서 프로젝트 생성
+2. SQL Editor에서 `supabase/migrations/001_initial_schema.sql` 실행
+3. API Keys 복사
+
+### 4️⃣ 환경변수 설정
+
+```bash
+cp .env.example .env
 ```
 
-### 3️⃣ 배포
+`.env` 파일 수정:
 
-#### Netlify로 배포 (권장 ⭐)
+```env
+VITE_SUPABASE_URL=https://xxxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbG...your-key
+VITE_REGISTER_CODE=YOUR_REGISTER_CODE_HERE
+```
 
-1. **GitHub 저장소에 푸시**
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
+### 5️⃣ 로컬 개발 서버 실행
 
-2. **Netlify 배포**
-   - [Netlify](https://netlify.com) 로그인
-   - **Add new site** > **Import an existing project**
-   - GitHub 저장소 선택
+```bash
+npm run dev
+```
 
-3. **환경 변수 설정** (중요! 🔐)
-   
-   Netlify Dashboard에서:
-   - **Site settings** > **Environment variables** 클릭
-   - 다음 4개 변수 추가:
-   
-   | 변수명 | 값 |
-   |--------|-----|
-   | `SCRIPT_URL` | Google Apps Script 배포 URL |
-   | `REGISTER_CODE` | 등록코드 |
-   | `ADMIN_PASSWORD` | 관리자 비밀번호 |
-   | `SHEET_URL` | 구글 시트 URL |
-   
-   이 환경 변수들은 빌드 시 `build.sh`에 의해 `config.js`로 변환됩니다.
+`http://localhost:3000` 접속!
 
-4. **배포 트리거**
-   - **Deploys** 탭 > **Trigger deploy** > **Deploy site** 클릭
-   - 빌드가 완료될 때까지 대기 (약 30초)
+## 🌐 Vercel 배포
 
-5. **완료!**
-   - `https://your-site-name.netlify.app` 에서 확인
-   - 환경 변수는 안전하게 관리되며 GitHub에 노출되지 않음 ✅
-   - 관리자 페이지: `https://your-site-name.netlify.app/admin.html`
+### 방법 1: GitHub 연동 (권장)
 
-#### GitHub Pages로 배포 (선택사항)
+1. GitHub에 푸시
+2. [Vercel](https://vercel.com) 로그인
+3. **New Project** → GitHub repository 선택
+4. **Environment Variables** 추가:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_REGISTER_CODE`
+5. **Deploy** 클릭!
 
-<details>
-<summary>GitHub Pages 사용하려면 클릭</summary>
+### 방법 2: CLI
 
-1. GitHub 저장소 → **Settings** → **Pages**
-2. **Source**: `main` branch, `/ (root)` 선택
-3. **Save**
-4. `https://YOUR_USERNAME.github.io/REPO_NAME/` 에서 확인
+```bash
+npm install -g vercel
+vercel login
+vercel
 
-⚠️ **주의**: `config.js`를 GitHub에 올려야 하므로 비밀번호가 공개됩니다!
+# 환경변수 추가
+vercel env add VITE_SUPABASE_URL
+vercel env add VITE_SUPABASE_ANON_KEY
+vercel env add VITE_REGISTER_CODE
 
-</details>
+# 재배포
+vercel --prod
+```
 
-</details>
+## 📊 데이터 마이그레이션
 
+Google Sheets에서 Supabase로 데이터를 마이그레이션하려면:
 
+자세한 내용은 [`MIGRATION_GUIDE.md`](./MIGRATION_GUIDE.md) 참조
 
-## 📁 프로젝트 구조 및 기술 스택
+```bash
+# 1. Google Sheets에서 CSV 다운로드
+#    - 사용자목록 → users.csv
+#    - 인증기록 → checkins.csv
 
-<details>
-<summary>📖 자세히 보기</summary>
+# 2. CSV 파일을 프로젝트 루트에 복사
 
-### 📁 프로젝트 구조
+# 3. 의존성 설치
+npm install csv-parse
+
+# 4. 마이그레이션 실행
+node scripts/migrate-from-sheets.js
+```
+
+## 📁 프로젝트 구조
 
 ```
 bigbrain-tracker/
-├── backend/
-│   └── Code.gs              # Google Apps Script (서버 로직)
-├── frontend/                # 배포 디렉토리 (Netlify가 이 폴더를 배포)
-│   ├── index.html           # 사용자 페이지
-│   ├── admin.html           # 관리자 페이지
-│   └── config.js            # 빌드 시 자동 생성 (gitignore됨)
-├── screenshots/             # README용 스크린샷
-├── config.example.js        # 설정 템플릿 (환경 변수 예시)
-├── build.sh                 # Netlify 빌드 스크립트 (frontend/config.js 생성)
-├── netlify.toml             # Netlify 배포 설정
-├── .gitignore               # Git 제외 파일
-├── LICENSE                  # MIT 라이센스
-├── CONTRIBUTING.md          # 기여 가이드
-└── README.md                # 프로젝트 문서
+├── index.html              # 메인 페이지
+├── admin.html              # 관리자 대시보드
+├── package.json
+├── vite.config.js
+├── vercel.json
+├── .env.example
+├── src/
+│   ├── main.js             # 메인 앱 로직
+│   ├── admin.js            # 관리자 로직
+│   ├── api.js              # Supabase API 호출
+│   ├── supabaseClient.js   # Supabase 클라이언트
+│   ├── style.css
+│   └── admin-style.css
+├── supabase/
+│   ├── SETUP.md            # Supabase 설정 가이드
+│   └── migrations/
+│       └── 001_initial_schema.sql
+├── scripts/
+│   └── migrate-from-sheets.js
+├── backend/                # (구버전 - Google Apps Script)
+└── frontend/               # (구버전 - 순수 HTML)
 ```
 
-### 파일 구조 설명
+## 🎯 사용 방법
 
-- **`frontend/`**: 
-  - 소스 파일이 있는 디렉토리
-  - Netlify가 이 폴더를 배포 (`publish = "frontend"`)
-  - 빌드 시 `config.js`가 자동 생성됨
-- **`build.sh`**: Netlify 빌드 시 환경 변수로부터 `frontend/config.js` 자동 생성
-- **`netlify.toml`**: Netlify 빌드 설정 (환경 변수 사용)
+### 일반 사용자
 
-## 🛠 기술 스택
+1. **등록**: 등록코드를 받아 계정 생성 (이름 + 4자리 비밀번호)
+2. **매일 인증**: 리트코드 문제를 풀고 인증
+3. **내 기록**: 비밀번호로 내 통계 및 기록 확인
+4. **문제 수정**: 잘못 입력한 문제 이름 수정 가능
 
-- **Backend**: Google Apps Script (JavaScript)
-- **Database**: Google Sheets
-- **Frontend**: Vanilla HTML/CSS/JavaScript
-- **Hosting**: Netlify (권장)
+### 관리자
 
-## 🌍 타임존 독립성
+`/admin.html` 접속:
+- 전체 통계 확인 (총 사용자, 총 인증, 오늘 인증)
+- 사용자별 인증 현황 조회
+- 최근 인증 기록 확인
+- 사용자 삭제
 
-이 시스템은 **타임존 독립적**으로 설계되었습니다:
-- 각 사용자가 자신의 로컬 타임존에서 날짜 선택
-- 날짜를 **문자열**(MM/DD)로 저장하여 타임존 이슈 방지
-- 한국/미국/유럽 어디서든 동일하게 작동
+## 🔧 개발
 
-</details>
+### 빌드
 
-## 📊 Google Sheets 데이터 구조
-
-<details>
-<summary>📖 자세히 보기</summary>
-
-배포 후 자동으로 3개의 시트가 생성됩니다:
-
-### 1. 사용자목록
-| 사용자명 | 비밀번호 | 등록일시 |
-|---------|---------|---------|
-| 홍길동 | '1234 | 2024-12-02T... |
-
-### 2. 인증기록
-| 타임스탬프 | 날짜 | 사용자명 | 문제명 |
-|-----------|------|---------|--------|
-| 2024-12-02T... | '12/02 | 홍길동 | 1. Two Sum |
-
-### 3. 주간리포트 (자동 생성)
-| 사용자명 | 인증 횟수 | 인증 날짜들 | 누락 | 상태 |
-|---------|----------|-----------|------|------|
-| 홍길동 | 6 | 11/25, 11/26... | 1 | ✅ 통과 |
-
-## ⚙️ 고급 설정
-
-### 자동 주간 리포트 설정
-
-Apps Script 에디터에서 함수 실행:
-```javascript
-setupWeeklyTrigger()  // 매주 일요일 밤 11:59 PM (PST)
+```bash
+npm run build
 ```
 
-### 커스텀 기간 리포트 생성
+빌드 결과물은 `dist/` 폴더에 생성됩니다.
 
-Apps Script에서 직접 실행 가능:
-```javascript
-generate3DayReport()    // 최근 3일
-generate7DayReport()    // 최근 7일 (기본)
-generate14DayReport()   // 최근 14일
-generate30DayReport()   // 최근 30일
+### 프리뷰
+
+```bash
+npm run preview
 ```
 
-또는 관리자 대시보드에서 원하는 날짜 범위 선택하여 커스텀리포트 생성 가능
+## 🐛 문제 해결
 
-</details>
+### CORS 에러
 
-## 🔒 보안
+Supabase 프로젝트 설정 확인:
+- API → Settings → CORS allowed origins에 도메인 추가
 
-<details>
-<summary>📖 자세히 보기</summary>
+### 환경변수가 undefined
 
-### 접근 제어
-- **등록코드**: 스터디 그룹 멤버만 가입 가능하도록 등록코드 필수 🔐
-- **이중 검증**: 프론트엔드와 백엔드 모두에서 등록코드 검증
-- 비밀번호는 Google Sheets에 평문 저장 (개인 스터디용)
+```bash
+# .env 파일 확인
+cat .env
 
-### 민감한 정보 관리 (Netlify 환경 변수)
+# Vite 서버 재시작
+npm run dev
+```
 
-**Netlify 배포 시**:
-- ✅ 민감한 정보는 **Netlify 환경 변수**에 저장
-- ✅ GitHub에는 절대 올라가지 않음
-- ✅ `build.sh`가 빌드 타임에만 `config.js` 생성
-- ✅ Netlify Dashboard에서만 관리 가능
+### 데이터가 보이지 않음
 
-**GitHub에 올라가는 것**:
-- `config.example.js` - 템플릿만 (실제 값 없음)
-- `build.sh` - 빌드 스크립트 (환경 변수 사용)
-- `netlify.toml` - 빌드 설정 (환경 변수 이름만)
-- `Code.gs` - 플레이스홀더만 (`YOUR_REGISTER_CODE_HERE`)
+Supabase Dashboard → Table Editor에서 데이터 확인
 
-**GitHub에 올라가지 않는 것**:
-- `config.js` - 로컬 테스트용 (`.gitignore`에 포함)
-- 실제 등록코드, 비밀번호, URL - Netlify 환경 변수에만 존재
+## 📝 라이선스
 
-### 등록코드 관리 팁
-- 정기적으로 등록코드 변경 (Netlify Dashboard에서 쉽게 변경)
-- 외부 공개 금지 (스터디 멤버에게만 비공개 공유)
-- 탈퇴자 발생 시 등록코드 변경 권장
+MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 
-> 💡 **프로덕션 사용 시**: 적절한 암호화 및 인증 시스템 추가 권장
+단, 원저작자 표시를 유지해주세요.
 
-</details>
+## 👨‍💻 개발자
 
-## 📝 사용 시나리오
-
-<details>
-<summary>📖 자세히 보기</summary>
-
-### 스터디 그룹 운영자
-1. 시스템 배포 (5분)
-2. 등록코드 설정 (프론트엔드 + 백엔드)
-3. 멤버들에게 **URL + 등록코드** 비공개로 공유
-4. 매주 자동 리포트 확인
-5. 탈락 위험자 체크 및 독려
-
-### 스터디 참여자
-1. 운영자에게 등록코드 받기
-2. 회원가입 (등록코드 + 이름 + 비밀번호)
-3. 매일 문제 풀고 인증
-4. 본인 통계 확인
-5. 꾸준히 참여!
-
-</details>
+**Yooni Choi**
+- GitHub: [@yoonichoi](https://github.com/yoonichoi)
+- Email: [GitHub Profile](https://github.com/yoonichoi)
 
 ## 🤝 기여
 
-버그 리포트나 기능 제안은 Issues에 등록해주세요!
+Issues와 Pull Requests를 환영합니다!
 
-## 📄 라이센스
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-MIT License - 자유롭게 사용하세요!
+## 📸 스크린샷
 
-## 📞 문의
+### 메인 페이지
+![Main](screenshots/checkin.png)
 
-프로젝트 관련 문의나 질문은 Issues를 통해 남겨주세요.
+### 내 기록
+![History](screenshots/mystat.png)
 
-<div align="center">
-
-**⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!**
+### 관리자 대시보드
+![Admin](screenshots/admin-dashboard.png)
 
 ---
 
-### 👨‍💻 만든 사람
+## 🆚 v1 vs v2
 
-**Yooni Choi** ([@yoonichoi](https://github.com/yoonichoi))
+### v1 (Google Apps Script)
+- ✅ 간단한 설정
+- ❌ 느린 응답 속도
+- ❌ 제한적인 기능
+- ❌ Apps Script 제약
 
-Made with ❤️ for LeetCode enthusiasts
+### v2 (Supabase + Vite + Vercel)
+- ✅ 빠른 응답 속도
+- ✅ 모던 개발 환경 (`npm run dev`)
+- ✅ 강력한 데이터베이스 (PostgreSQL)
+- ✅ 자동 배포
+- ✅ 실시간 기능 가능
+- ✅ 확장 가능한 구조
 
-Copyright © 2025 Yooni Choi. All rights reserved.
+---
 
-</div>
+Made with ❤️ by Yooni Choi
 
+**Star ⭐️ this repo if you find it helpful!**

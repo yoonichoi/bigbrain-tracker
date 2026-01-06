@@ -230,6 +230,47 @@
             white-space: nowrap;
         }
         
+        .edit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 12px;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+        
+        .edit-btn:hover {
+            background: #5568d3;
+        }
+        
+        .save-btn {
+            background: #10b981;
+        }
+        
+        .save-btn:hover {
+            background: #059669;
+        }
+        
+        .cancel-btn {
+            background: #999;
+        }
+        
+        .cancel-btn:hover {
+            background: #666;
+        }
+        
+        .problem-input {
+            flex: 1;
+            padding: 5px 10px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-left: 20px;
+        }
+        
         .stats-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -362,6 +403,11 @@
                 <label>이름 입력</label>
                 <input type="text" id="history-username" list="history-username-list" placeholder="이름 입력..." autocomplete="off">
                 <datalist id="history-username-list"></datalist>
+            </div>
+            
+            <div class="form-group">
+                <label>비밀번호 (4자리)</label>
+                <input type="password" id="history-password" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required>
             </div>
             
             <button onclick="loadMyHistory()" id="load-history-btn">🔍 내 기록 보기</button>
@@ -645,6 +691,7 @@
         // 내 기록 로드
         async function loadMyHistory() {
             const username = document.getElementById('history-username').value.trim();
+            const password = document.getElementById('history-password').value;
             const btn = document.getElementById('load-history-btn');
             const errorMsg = document.getElementById('history-error');
             const statsDiv = document.getElementById('my-stats');
@@ -656,24 +703,33 @@
                 return;
             }
             
+            if (!password || password.length !== 4) {
+                showError('history-error', '4자리 비밀번호를 입력해주세요!');
+                return;
+            }
+            
             btn.disabled = true;
             btn.textContent = '로딩 중...';
             
             try {
-                const response = await fetch(SCRIPT_URL + '?action=stats&username=' + encodeURIComponent(username));
+                const response = await fetch(SCRIPT_URL + '?action=stats&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
                 const result = await response.json();
                 
-                if (result.count === 0) {
+                if (result.status === 'unauthorized') {
+                    showError('history-error', '비밀번호가 틀렸습니다!');
+                    statsDiv.style.display = 'none';
+                } else if (result.count === 0) {
                     showError('history-error', '인증 기록이 없습니다.');
                     statsDiv.style.display = 'none';
                 } else {
                     document.getElementById('my-total-count').textContent = result.count;
                     document.getElementById('my-last-date').textContent = result.lastDate || '-';
                     
-                    const historyHTML = result.history.map(item => `
-                        <div class="history-item">
+                    const historyHTML = result.history.map((item, index) => `
+                        <div class="history-item" id="history-item-${index}" data-date="${item.date}" data-problem="${item.problem}" data-timestamp="${item.timestamp}">
                             <span class="history-date">${item.date}</span>
-                            <span class="history-problem">${item.problem}</span>
+                            <span class="history-problem" id="problem-text-${index}">${item.problem}</span>
+                            <button class="edit-btn" onclick="editProblem(${index})">수정</button>
                         </div>
                     `).join('');
                     
@@ -687,6 +743,109 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = '🔍 내 기록 보기';
+            }
+        }
+        
+        // 문제 이름 수정
+        function editProblem(index) {
+            const item = document.getElementById(`history-item-${index}`);
+            const problemText = document.getElementById(`problem-text-${index}`);
+            const currentProblem = item.getAttribute('data-problem');
+            
+            // 수정 모드로 전환
+            problemText.innerHTML = `<input type="text" class="problem-input" id="problem-input-${index}" value="${currentProblem}">`;
+            
+            // 버튼 변경
+            const buttons = item.querySelector('.edit-btn');
+            buttons.outerHTML = `
+                <button class="edit-btn save-btn" onclick="saveProblem(${index})">저장</button>
+                <button class="edit-btn cancel-btn" onclick="cancelEdit(${index})">취소</button>
+            `;
+            
+            // 입력 필드에 포커스
+            document.getElementById(`problem-input-${index}`).focus();
+        }
+        
+        // 수정 취소
+        function cancelEdit(index) {
+            const item = document.getElementById(`history-item-${index}`);
+            const problemText = document.getElementById(`problem-text-${index}`);
+            const currentProblem = item.getAttribute('data-problem');
+            
+            // 원래대로 복원
+            problemText.textContent = currentProblem;
+            
+            // 버튼 복원
+            const buttons = item.querySelectorAll('.edit-btn');
+            buttons[0].outerHTML = `<button class="edit-btn" onclick="editProblem(${index})">수정</button>`;
+            buttons[1].remove();
+        }
+        
+        // 문제 이름 저장
+        async function saveProblem(index) {
+            const item = document.getElementById(`history-item-${index}`);
+            const input = document.getElementById(`problem-input-${index}`);
+            const newProblem = input.value.trim();
+            
+            if (!newProblem) {
+                alert('문제 이름을 입력해주세요!');
+                return;
+            }
+            
+            const username = document.getElementById('history-username').value.trim();
+            const password = document.getElementById('history-password').value;
+            const date = item.getAttribute('data-date');
+            const timestamp = item.getAttribute('data-timestamp');
+            
+            try {
+                // 저장 버튼 비활성화
+                const saveBtn = item.querySelector('.save-btn');
+                saveBtn.disabled = true;
+                saveBtn.textContent = '저장 중...';
+                
+                const response = await fetch(SCRIPT_URL + '?action=updateProblem', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        date: date,
+                        timestamp: timestamp,
+                        newProblem: newProblem
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'unauthorized') {
+                    alert('비밀번호가 틀렸습니다!');
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '저장';
+                } else if (result.status === 'success') {
+                    // 성공: 화면 업데이트
+                    item.setAttribute('data-problem', newProblem);
+                    document.getElementById(`problem-text-${index}`).textContent = newProblem;
+                    
+                    // 버튼 복원
+                    const buttons = item.querySelectorAll('.edit-btn');
+                    buttons[0].outerHTML = `<button class="edit-btn" onclick="editProblem(${index})">수정</button>`;
+                    buttons[1].remove();
+                    
+                    alert('✅ 문제 이름이 수정되었습니다!');
+                } else {
+                    throw new Error(result.message || '알 수 없는 오류');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('저장 실패! 다시 시도해주세요.');
+                
+                // 버튼 복원
+                const saveBtn = item.querySelector('.save-btn');
+                saveBtn.disabled = false;
+                saveBtn.textContent = '저장';
             }
         }
         

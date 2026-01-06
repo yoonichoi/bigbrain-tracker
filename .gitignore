@@ -43,9 +43,6 @@ Desktop.ini
 .env.local
 .env.*.local
 
-# Configuration with sensitive data
-frontend/config.js
-
 # Logs
 logs
 *.log
@@ -57,3 +54,16 @@ yarn-error.log*
 *.tmp
 *.temp
 
+# Node modules
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Local dev files
+config.local.js
+mock-server.js
+
+# Old frontend folder (moved to root)
+frontend/config.js
