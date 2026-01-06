@@ -20,6 +20,10 @@ import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
 import { parse } from 'csv-parse/sync'
+import dotenv from 'dotenv'
+
+// .env 파일 로드
+dotenv.config()
 
 // Supabase 클라이언트 초기화
 const supabaseUrl = process.env.VITE_SUPABASE_URL

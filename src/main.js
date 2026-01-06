@@ -285,13 +285,22 @@ async function loadMyHistory() {
       document.getElementById('my-total-count').textContent = result.count
       document.getElementById('my-last-date').textContent = result.lastDate || '-'
       
-      const historyHTML = result.history.map((item, index) => `
-        <div class="history-item" id="history-item-${index}" data-date="${item.date}" data-problem="${item.problem}" data-timestamp="${item.timestamp}">
-          <span class="history-date">${item.date}</span>
-          <span class="history-problem" id="problem-text-${index}">${item.problem}</span>
-          <button class="edit-btn" onclick="window.editProblem(${index})">수정</button>
-        </div>
-      `).join('')
+      const historyHTML = result.history.map((item, index) => {
+        // 문제 이름 처리: 없거나 "미입력"이면 회색으로 표시
+        const problemName = (item.problem && item.problem !== '미입력') 
+          ? item.problem 
+          : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+        
+        return `
+          <div class="history-item" id="history-item-${index}" data-date="${item.date}" data-problem="${item.problem || ''}" data-timestamp="${item.timestamp}">
+            <span class="history-date">${item.date}</span>
+            <span class="history-problem" id="problem-text-${index}">${problemName}</span>
+            <button class="edit-icon-btn" onclick="window.editProblem(${index})" title="문제 이름 수정">
+              ✎
+            </button>
+          </div>
+        `
+      }).join('')
       
       document.getElementById('my-history-list').innerHTML = historyHTML
       statsDiv.style.display = 'block'
@@ -312,29 +321,62 @@ async function loadMyHistory() {
 window.editProblem = function(index) {
   const item = document.getElementById(`history-item-${index}`)
   const problemText = document.getElementById(`problem-text-${index}`)
-  const currentProblem = item.getAttribute('data-problem')
+  const currentProblem = item.getAttribute('data-problem') || ''
   
-  problemText.innerHTML = `<input type="text" class="problem-input" id="problem-input-${index}" value="${currentProblem}">`
+  // 편집 모드로 전환
+  item.classList.add('editing')
   
-  const buttons = item.querySelector('.edit-btn')
-  buttons.outerHTML = `
-    <button class="edit-btn save-btn" onclick="window.saveProblem(${index})">저장</button>
-    <button class="edit-btn cancel-btn" onclick="window.cancelEdit(${index})">취소</button>
+  problemText.innerHTML = `
+    <input type="text" class="problem-input" id="problem-input-${index}" 
+           value="${currentProblem}" placeholder="문제 이름 입력...">
   `
   
-  document.getElementById(`problem-input-${index}`).focus()
+  const editBtn = item.querySelector('.edit-icon-btn')
+  editBtn.outerHTML = `
+    <div class="inline-edit-buttons">
+      <button class="icon-btn save-btn" onclick="window.saveProblem(${index})" title="저장">✓</button>
+      <button class="icon-btn cancel-btn" onclick="window.cancelEdit(${index})" title="취소">✕</button>
+    </div>
+  `
+  
+  // 입력 필드에 포커스 & 전체 선택
+  const input = document.getElementById(`problem-input-${index}`)
+  input.focus()
+  input.select()
+  
+  // Enter 키로 저장, Escape 키로 취소
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      window.saveProblem(index)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      window.cancelEdit(index)
+    }
+  })
 }
 
 window.cancelEdit = function(index) {
   const item = document.getElementById(`history-item-${index}`)
   const problemText = document.getElementById(`problem-text-${index}`)
-  const currentProblem = item.getAttribute('data-problem')
+  const currentProblem = item.getAttribute('data-problem') || ''
   
-  problemText.textContent = currentProblem
+  // 편집 모드 해제
+  item.classList.remove('editing')
   
-  const buttons = item.querySelectorAll('.edit-btn')
-  buttons[0].outerHTML = `<button class="edit-btn" onclick="window.editProblem(${index})">수정</button>`
-  buttons[1].remove()
+  // 원래 표시로 복원
+  const displayText = (currentProblem && currentProblem !== '미입력')
+    ? currentProblem
+    : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+  
+  problemText.innerHTML = displayText
+  
+  const buttons = item.querySelector('.inline-edit-buttons')
+  buttons.outerHTML = `
+    <button class="edit-icon-btn" onclick="window.editProblem(${index})" title="문제 이름 수정">
+      ✎
+    </button>
+  `
 }
 
 window.saveProblem = async function(index) {
@@ -342,35 +384,56 @@ window.saveProblem = async function(index) {
   const input = document.getElementById(`problem-input-${index}`)
   const newProblem = input.value.trim()
   
-  if (!newProblem) {
-    alert('문제 이름을 입력해주세요!')
-    return
-  }
-  
   const username = document.getElementById('history-username').value.trim()
   const password = document.getElementById('history-password').value
   const timestamp = item.getAttribute('data-timestamp')
   
   try {
     const saveBtn = item.querySelector('.save-btn')
-    saveBtn.disabled = true
-    saveBtn.textContent = '저장 중...'
+    const cancelBtn = item.querySelector('.cancel-btn')
     
-    const result = await API.updateProblem(username, password, timestamp, newProblem)
+    // 버튼 비활성화
+    saveBtn.disabled = true
+    cancelBtn.disabled = true
+    saveBtn.innerHTML = '⏳'
+    saveBtn.title = '저장 중...'
+    
+    const result = await API.updateProblem(username, password, timestamp, newProblem || '미입력')
     
     if (result.status === 'unauthorized') {
       alert('비밀번호가 틀렸습니다!')
       saveBtn.disabled = false
-      saveBtn.textContent = '저장'
+      cancelBtn.disabled = false
+      saveBtn.innerHTML = '✓'
+      saveBtn.title = '저장'
     } else if (result.status === 'success') {
-      item.setAttribute('data-problem', newProblem)
-      document.getElementById(`problem-text-${index}`).textContent = newProblem
+      // 편집 모드 해제
+      item.classList.remove('editing')
       
-      const buttons = item.querySelectorAll('.edit-btn')
-      buttons[0].outerHTML = `<button class="edit-btn" onclick="window.editProblem(${index})">수정</button>`
-      buttons[1].remove()
+      // 데이터 업데이트
+      item.setAttribute('data-problem', newProblem || '')
       
-      alert('✅ 문제 이름이 수정되었습니다!')
+      // 표시 업데이트
+      const displayText = newProblem
+        ? newProblem
+        : '<span style="color: #999; font-style: italic;">(문제 이름 없음)</span>'
+      
+      document.getElementById(`problem-text-${index}`).innerHTML = displayText
+      
+      // 버튼을 연필 아이콘으로 복원
+      const buttons = item.querySelector('.inline-edit-buttons')
+      buttons.outerHTML = `
+        <button class="edit-icon-btn" onclick="window.editProblem(${index})" title="문제 이름 수정">
+          ✎
+        </button>
+      `
+      
+      // 성공 표시 (간단하게)
+      const problemText = document.getElementById(`problem-text-${index}`)
+      problemText.style.color = '#10b981'
+      setTimeout(() => {
+        problemText.style.color = ''
+      }, 1000)
     } else {
       throw new Error(result.message || '알 수 없는 오류')
     }
@@ -379,9 +442,12 @@ window.saveProblem = async function(index) {
     alert('저장 실패! 다시 시도해주세요.')
     
     const saveBtn = item.querySelector('.save-btn')
+    const cancelBtn = item.querySelector('.cancel-btn')
     if (saveBtn) {
       saveBtn.disabled = false
-      saveBtn.textContent = '저장'
+      cancelBtn.disabled = false
+      saveBtn.innerHTML = '✓'
+      saveBtn.title = '저장'
     }
   }
 }

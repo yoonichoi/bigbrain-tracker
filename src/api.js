@@ -407,3 +407,67 @@ export async function deleteUser(username) {
   }
 }
 
+// ========================================
+// Weekly Reports API
+// ========================================
+
+/**
+ * 가장 최근 주간 리포트 가져오기
+ */
+export async function getLatestWeeklyReport() {
+  try {
+    const { data, error } = await supabase
+      .from('weekly_reports')
+      .select('*')
+      .order('week_start', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (error) {
+      // 리포트가 없을 수 있음
+      if (error.code === 'PGRST116') {
+        return {
+          status: 'success',
+          report: null
+        }
+      }
+      throw error
+    }
+    
+    return {
+      status: 'success',
+      report: data
+    }
+  } catch (error) {
+    console.error('Error fetching latest report:', error)
+    return {
+      status: 'error',
+      message: error.message,
+      report: null
+    }
+  }
+}
+
+/**
+ * 수동으로 주간 리포트 생성 (관리자용)
+ */
+export async function generateWeeklyReportManually() {
+  try {
+    const { error } = await supabase
+      .rpc('generate_weekly_report')
+    
+    if (error) throw error
+    
+    return {
+      status: 'success',
+      message: '주간 리포트가 생성되었습니다'
+    }
+  } catch (error) {
+    console.error('Error generating report:', error)
+    return {
+      status: 'error',
+      message: error.message
+    }
+  }
+}
+

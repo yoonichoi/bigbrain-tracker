@@ -1,8 +1,0 @@
-# Netlify 배포 설정
-[build]
-  command = "bash build.sh"
-  publish = "frontend"
-
-# 환경 변수 설정 (Netlify Dashboard에서 설정)
-# SCRIPT_URL, REGISTER_CODE, ADMIN_PASSWORD, SHEET_URL
-

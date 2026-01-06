@@ -10,9 +10,141 @@ body {
     padding: 20px;
 }
 
+/* 로그인 화면 */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.login-box h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.login-box button:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.login-box button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* 대시보드 */
 .container {
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.header-with-logout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-with-logout h1 {
+    color: #333;
+    margin: 0;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
 }
 
 h1 {
@@ -62,17 +194,103 @@ h2 {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.section-header:hover h2 {
+    color: #667eea;
+}
+
+.expand-btn {
+    background: #f8f9fa;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.3s;
+}
+
+.expand-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.expand-btn.expanded {
+    transform: rotate(180deg);
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.warning-banner {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.warning-banner strong {
+    color: #92400e;
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.warning-banner #dropout-list {
+    color: #b45309;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
 .table-container {
     overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 thead {
     background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 th {
@@ -81,6 +299,7 @@ th {
     color: #555;
     font-weight: 600;
     border-bottom: 2px solid #e0e0e0;
+    background: #f8f9fa;
 }
 
 td {
@@ -91,6 +310,22 @@ td {
 
 tbody tr:hover {
     background: #f8f9fa;
+}
+
+.success-row {
+    background: #d9ead3 !important;
+}
+
+.danger-row {
+    background: #f4cccc !important;
+}
+
+.success-row:hover {
+    background: #c6dfc0 !important;
+}
+
+.danger-row:hover {
+    background: #e8b8b8 !important;
 }
 
 .delete-btn {

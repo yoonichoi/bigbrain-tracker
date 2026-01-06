@@ -38,7 +38,7 @@ Desktop.ini
 *.sw?
 *~
 
-# Environment variables
+# Environment variables (CONTAINS SENSITIVE DATA!)
 .env
 .env.local
 .env.*.local
@@ -65,5 +65,16 @@ dist-ssr/
 config.local.js
 mock-server.js
 
-# Old frontend folder (moved to root)
-frontend/config.js
+# Documentation (contains setup instructions, not for public)
+*.md
+!README.md
+!LICENSE
+
+# CSV data files (may contain user data)
+*.csv
+
+# Old files
+config.js
+config.example.js
+build.sh
+netlify.toml
