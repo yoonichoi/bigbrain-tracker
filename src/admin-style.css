@@ -100,16 +100,25 @@ body {
 }
 
 .back-link {
-    display: block;
+    display: inline-block;
     text-align: center;
     margin-top: 20px;
+    padding: 12px 24px;
+    background: #f8f9fa;
     color: #667eea;
     text-decoration: none;
     font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid #667eea;
+    transition: all 0.3s;
 }
 
 .back-link:hover {
-    text-decoration: underline;
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 /* 대시보드 */
