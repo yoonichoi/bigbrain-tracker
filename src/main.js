@@ -223,7 +223,11 @@ async function handleCheckin(e) {
   try {
     const result = await API.checkin(username, password, dateStr, problem)
     
-    if (result.status === 'unauthorized') {
+    if (result.status === 'user_not_found') {
+      showError('checkin-error', '등록되지 않은 사용자입니다!')
+      checkinBtn.disabled = false
+      checkinBtn.textContent = '✅ 인증 완료'
+    } else if (result.status === 'unauthorized') {
       showError('checkin-error', '비밀번호가 틀렸습니다!')
       checkinBtn.disabled = false
       checkinBtn.textContent = '✅ 인증 완료'
@@ -275,7 +279,10 @@ async function loadMyHistory() {
   try {
     const result = await API.getUserStats(username, password)
     
-    if (result.status === 'unauthorized') {
+    if (result.status === 'user_not_found') {
+      showError('history-error', '등록되지 않은 사용자입니다!')
+      statsDiv.style.display = 'none'
+    } else if (result.status === 'unauthorized') {
       showError('history-error', '비밀번호가 틀렸습니다!')
       statsDiv.style.display = 'none'
     } else if (result.count === 0) {
@@ -400,7 +407,13 @@ window.saveProblem = async function(index) {
     
     const result = await API.updateProblem(username, password, timestamp, newProblem || '미입력')
     
-    if (result.status === 'unauthorized') {
+    if (result.status === 'user_not_found') {
+      alert('등록되지 않은 사용자입니다!')
+      saveBtn.disabled = false
+      cancelBtn.disabled = false
+      saveBtn.innerHTML = '✓'
+      saveBtn.title = '저장'
+    } else if (result.status === 'unauthorized') {
       alert('비밀번호가 틀렸습니다!')
       saveBtn.disabled = false
       cancelBtn.disabled = false

@@ -82,6 +82,7 @@ export async function registerUser(registerCode, username, password) {
 
 /**
  * 사용자 인증 (비밀번호 확인)
+ * @returns {Object} { exists: boolean, valid: boolean }
  */
 export async function verifyUser(username, password) {
   try {
@@ -91,12 +92,17 @@ export async function verifyUser(username, password) {
       .eq('username', username)
       .single()
     
-    if (error || !data) return false
+    // 유저가 없음
+    if (error || !data) {
+      return { exists: false, valid: false }
+    }
     
-    return data.password === password
+    // 유저는 있지만 비밀번호 틀림
+    const isPasswordCorrect = data.password === password
+    return { exists: true, valid: isPasswordCorrect }
   } catch (error) {
     console.error('Error verifying user:', error)
-    return false
+    return { exists: false, valid: false }
   }
 }
 
@@ -110,8 +116,14 @@ export async function verifyUser(username, password) {
 export async function checkin(username, password, date, problem) {
   try {
     // 1. 비밀번호 확인
-    const isValid = await verifyUser(username, password)
-    if (!isValid) {
+    const authResult = await verifyUser(username, password)
+    if (!authResult.exists) {
+      return {
+        status: 'user_not_found',
+        message: '등록되지 않은 사용자입니다'
+      }
+    }
+    if (!authResult.valid) {
       return {
         status: 'unauthorized',
         message: '비밀번호가 틀렸습니다'
@@ -181,8 +193,14 @@ export async function getUserStats(username, password) {
   try {
     // 비밀번호 확인
     if (password) {
-      const isValid = await verifyUser(username, password)
-      if (!isValid) {
+      const authResult = await verifyUser(username, password)
+      if (!authResult.exists) {
+        return {
+          status: 'user_not_found',
+          message: '등록되지 않은 사용자입니다'
+        }
+      }
+      if (!authResult.valid) {
         return {
           status: 'unauthorized',
           message: '비밀번호가 틀렸습니다'
@@ -237,8 +255,14 @@ export async function getUserStats(username, password) {
 export async function updateProblem(username, password, timestamp, newProblem) {
   try {
     // 1. 비밀번호 확인
-    const isValid = await verifyUser(username, password)
-    if (!isValid) {
+    const authResult = await verifyUser(username, password)
+    if (!authResult.exists) {
+      return {
+        status: 'user_not_found',
+        message: '등록되지 않은 사용자입니다'
+      }
+    }
+    if (!authResult.valid) {
       return {
         status: 'unauthorized',
         message: '비밀번호가 틀렸습니다'
