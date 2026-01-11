@@ -259,30 +259,68 @@ async function handleCheckin(e) {
 // 내 기록 로드
 // ========================================
 
+// 이번주 시작일 계산 (월요일 기준)
+function getThisWeekStart() {
+  const now = new Date()
+  const dayOfWeek = now.getDay() // 0=일요일, 1=월요일, ...
+  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // 월요일로 이동
+  const monday = new Date(now)
+  monday.setDate(now.getDate() + diff)
+  monday.setHours(0, 0, 0, 0)
+  return monday
+}
+
+// 이번주 인증 통계 계산
+function calculateWeekStats(history) {
+  const weekStart = getThisWeekStart()
+  const now = new Date()
+  
+  // 이번주 인증한 날짜들 (M/D 형식)
+  const weekCheckins = new Set()
+  
+  history.forEach(item => {
+    // item.date는 "M/D" 형식
+    const [month, day] = item.date.split('/').map(Number)
+    const checkDate = new Date(now.getFullYear(), month - 1, day)
+    
+    if (checkDate >= weekStart && checkDate <= now) {
+      weekCheckins.add(item.date)
+    }
+  })
+  
+  // 이번주 경과일 계산 (월요일부터 오늘까지)
+  const daysPassed = Math.floor((now - weekStart) / (1000 * 60 * 60 * 24)) + 1 // +1은 오늘 포함
+  
+  const count = weekCheckins.size
+  const missing = Math.max(0, daysPassed - count)
+  
+  return { count, missing }
+}
+
 async function loadMyHistory() {
   const username = document.getElementById('history-username').value.trim()
   const password = document.getElementById('history-password').value
   const btn = document.getElementById('load-history-btn')
   const statsDiv = document.getElementById('my-stats')
-  
+
   hideError('history-error')
-  
+
   if (!username) {
     showError('history-error', '이름을 입력해주세요!')
     return
   }
-  
+
   if (!password || password.length !== 4) {
     showError('history-error', '4자리 비밀번호를 입력해주세요!')
     return
   }
-  
+
   btn.disabled = true
   btn.textContent = '로딩 중...'
-  
+
   try {
     const result = await API.getUserStats(username, password)
-    
+
     if (result.status === 'user_not_found') {
       showError('history-error', '등록되지 않은 사용자입니다!')
       statsDiv.style.display = 'none'
@@ -295,7 +333,16 @@ async function loadMyHistory() {
     } else {
       document.getElementById('my-total-count').textContent = result.count
       document.getElementById('my-last-date').textContent = result.lastDate || '-'
-      
+
+      // 이번주 인증 통계 계산
+      const weekStats = calculateWeekStats(result.history)
+      document.getElementById('my-week-count').textContent = weekStats.count
+      const missingText = weekStats.missing > 0 ? `(${weekStats.missing}일 누락)` : ''
+      document.getElementById('my-week-missing').textContent = missingText
+
+      // 구제권 상태 로드
+      await loadExemptionStatus(username, password)
+
       const historyHTML = result.history.map((item, index) => {
         // 문제 이름 처리: 없거나 "미입력"이면 회색으로 표시
         const problemName = (item.problem && item.problem !== '미입력') 
@@ -490,5 +537,85 @@ function showSuccess(title, message) {
   successDiv.querySelector('h2').textContent = title
   successDiv.querySelector('p').innerHTML = message
   successDiv.style.display = 'block'
+}
+
+// ========================================
+// 구제권 기능
+// ========================================
+
+// 날짜 포맷 (YYYY-MM-DD -> M/D)
+function formatWeekDate(dateStr) {
+  const date = new Date(dateStr + 'T00:00:00')
+  return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+async function loadExemptionStatus(username, password) {
+  const cardEl = document.getElementById('exemption-section')
+  const statusEl = document.getElementById('exemption-status')
+  const btnEl = document.getElementById('use-exemption-btn')
+
+  statusEl.textContent = '확인 중...'
+  btnEl.style.display = 'none'
+  cardEl.classList.remove('used')
+
+  try {
+    const result = await API.canUseExemption(username, password)
+
+    if (result.status !== 'success') {
+      statusEl.textContent = '구제권 상태를 확인할 수 없습니다.'
+      return
+    }
+
+    if (result.canUse) {
+      // 사용 가능
+      const { weekStart, weekEnd } = result.currentWeek
+      statusEl.innerHTML = `<strong>구제권</strong> <span class="week-info">(이번주: ${formatWeekDate(weekStart)} ~ ${formatWeekDate(weekEnd)})</span>`
+      btnEl.style.display = 'block'
+      btnEl.onclick = () => handleUseExemption(username, password, weekStart, weekEnd)
+    } else {
+      // 이미 사용함
+      cardEl.classList.add('used')
+      statusEl.classList.add('used-status')
+      const used = result.usedRecord
+      const appliedWeek = `${formatWeekDate(used.applied_week_start)} ~ ${formatWeekDate(used.applied_week_end)}`
+      statusEl.innerHTML = `<strong>구제권 사용 완료</strong> <span class="week-info">(${appliedWeek} 주 적용됨)</span>`
+      btnEl.style.display = 'none'
+    }
+  } catch (error) {
+    console.error('Error loading exemption status:', error)
+    statusEl.textContent = '구제권 상태를 확인할 수 없습니다.'
+  }
+}
+
+async function handleUseExemption(username, password, weekStart, weekEnd) {
+  const weekRange = `${formatWeekDate(weekStart)} ~ ${formatWeekDate(weekEnd)}`
+
+  if (!confirm(`이번 주(${weekRange}) 누락 기록을 구제할까요?\n\n구제권은 한 달에 한 번만 사용할 수 있습니다.`)) {
+    return
+  }
+
+  const btnEl = document.getElementById('use-exemption-btn')
+  btnEl.disabled = true
+  btnEl.textContent = '처리 중...'
+
+  try {
+    const result = await API.useExemption(username, password, weekStart, weekEnd)
+
+    if (result.status === 'success') {
+      alert(`구제권이 사용되었습니다!\n\n${weekRange} 주의 누락 기록이 구제됩니다.`)
+      // 상태 새로고침
+      await loadExemptionStatus(username, password)
+    } else if (result.status === 'already_used') {
+      alert('이번 달 구제권을 이미 사용했습니다.')
+      await loadExemptionStatus(username, password)
+    } else {
+      throw new Error(result.message || '알 수 없는 오류')
+    }
+  } catch (error) {
+    console.error('Error using exemption:', error)
+    alert('구제권 사용에 실패했습니다. 다시 시도해주세요.')
+    btnEl.disabled = false
+    btnEl.textContent = '🛡️ 구제권 사용하기'
+  }
 }
 

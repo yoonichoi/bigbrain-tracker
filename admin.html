@@ -61,38 +61,110 @@
             <!-- Weekly Report (접었다 펼 수 있음) -->
             <div class="section">
                 <div class="section-header" onclick="toggleWeeklyReport()">
-                    <h2>📊 주간 리포트 <span id="report-week-range"></span></h2>
+                    <h2>📊 주간 리포트</h2>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <button class="generate-report-btn" onclick="generateReport(event)" title="수동으로 주간 리포트 생성">🔄 리포트 생성</button>
+                        <button class="generate-report-btn" onclick="showWeekSelector(event)" title="수동으로 주간 리포트 생성">🔄 리포트 생성</button>
                         <button class="expand-btn" id="expand-btn">▼</button>
                     </div>
                 </div>
                 
+                <!-- 주차 선택 UI -->
+                <div id="week-selector" style="display: none; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-top: 10px;">
+                    <p style="margin-bottom: 10px; font-weight: 600;">생성할 주간 리포트를 선택하세요:</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button id="btn-this-week" class="week-option-btn" onclick="generateReportForWeek(true)">
+                            <div style="font-weight: bold;">📅 이번 주</div>
+                            <div id="this-week-dates" style="font-size: 0.9em; color: #666; margin-top: 3px;"></div>
+                        </button>
+                        <button id="btn-last-week" class="week-option-btn" onclick="generateReportForWeek(false)">
+                            <div style="font-weight: bold;">📅 지난 주</div>
+                            <div id="last-week-dates" style="font-size: 0.9em; color: #666; margin-top: 3px;"></div>
+                        </button>
+                        <button onclick="hideWeekSelector()" style="background: #ccc; color: #333; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; min-width: 100px;">
+                            취소
+                        </button>
+                    </div>
+                </div>
+                
                 <div id="weekly-report-content" style="display: none;">
-                    <div class="loading" id="report-loading">로딩 중...</div>
+                    <!-- 탭 선택 -->
+                    <div class="report-tabs" style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #e0e0e0;">
+                        <button class="report-tab active" data-report-type="official" onclick="switchReportTab('official')">
+                            🔷 Official Report
+                        </button>
+                        <button class="report-tab" data-report-type="custom" onclick="switchReportTab('custom')">
+                            ✏️ Custom Report
+                        </button>
+                    </div>
                     
-                    <!-- 방출 위기 배너 -->
-                    <div id="dropout-warning" style="display: none;">
-                        <div class="warning-banner">
-                            <strong>⚠️ 방출 위기</strong>
-                            <div id="dropout-list"></div>
+                    <!-- Official Report -->
+                    <div id="official-report" class="report-view">
+                        <div class="report-header">
+                            <h3 style="color: #667eea; margin-bottom: 5px;">📅 Official Weekly Report <span id="official-week-range"></span></h3>
+                            <p style="color: #999; font-size: 0.85em;">매주 월요일 3AM EST 자동 생성</p>
+                        </div>
+                        <div class="loading" id="official-loading">로딩 중...</div>
+                        <div id="official-dropout-warning" style="display: none;">
+                            <div class="warning-banner">
+                                <strong>⚠️ 방출 위기</strong>
+                                <div id="official-dropout-list"></div>
+                            </div>
+                            <div id="official-exempted-info" style="display: none; margin-top: 10px;">
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; border-radius: 4px;">
+                                    <strong>🛡️ 구제권 사용</strong>
+                                    <div id="official-exempted-list" style="margin-top: 5px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container" id="official-table-container" style="display: none;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>이름</th>
+                                        <th>인증 횟수</th>
+                                        <th>인증 날짜</th>
+                                        <th>누락</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="official-tbody"></tbody>
+                            </table>
                         </div>
                     </div>
                     
-                    <!-- 리포트 테이블 -->
-                    <div class="table-container" id="report-table-container" style="display: none;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>이름</th>
-                                    <th>인증 횟수</th>
-                                    <th>인증 날짜</th>
-                                    <th>누락</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody id="report-tbody"></tbody>
-                        </table>
+                    <!-- Custom Report -->
+                    <div id="custom-report" class="report-view" style="display: none;">
+                        <div class="report-header">
+                            <h3 style="color: #764ba2; margin-bottom: 5px;">✏️ Custom Weekly Report <span id="custom-week-range"></span></h3>
+                            <p style="color: #999; font-size: 0.85em;">Created at: <span id="custom-created-at"></span></p>
+                        </div>
+                        <div class="loading" id="custom-loading">로딩 중...</div>
+                        <div id="custom-dropout-warning" style="display: none;">
+                            <div class="warning-banner">
+                                <strong>⚠️ 방출 위기</strong>
+                                <div id="custom-dropout-list"></div>
+                            </div>
+                            <div id="custom-exempted-info" style="display: none; margin-top: 10px;">
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; border-radius: 4px;">
+                                    <strong>🛡️ 구제권 사용</strong>
+                                    <div id="custom-exempted-list" style="margin-top: 5px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container" id="custom-table-container" style="display: none;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>이름</th>
+                                        <th>인증 횟수</th>
+                                        <th>인증 날짜</th>
+                                        <th>누락</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="custom-tbody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

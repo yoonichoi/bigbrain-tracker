@@ -432,6 +432,189 @@ export async function deleteUser(username) {
 }
 
 // ========================================
+// Exemption (구제권) API
+// ========================================
+
+/**
+ * 현재 주의 월~일요일 범위 계산 (사용자 로컬 타임존 기준)
+ * @param {Date} today - 기준 날짜
+ * @returns {{ weekStart: string, weekEnd: string }} YYYY-MM-DD 형식
+ */
+function getCurrentWeekRange(today = new Date()) {
+  const day = today.getDay() // 0=일, 1=월, ...
+  const diff = day === 0 ? -6 : 1 - day // 일요일이면 -6, 아니면 1-day
+
+  const monday = new Date(today)
+  monday.setDate(today.getDate() + diff)
+  monday.setHours(0, 0, 0, 0)
+
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+
+  // YYYY-MM-DD 형식으로 변환
+  const formatDate = (d) => {
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  return {
+    weekStart: formatDate(monday),
+    weekEnd: formatDate(sunday)
+  }
+}
+
+/**
+ * 이번 달 구제 사용 가능 여부 확인
+ */
+export async function canUseExemption(username, password) {
+  try {
+    // 1. 비밀번호 확인
+    const authResult = await verifyUser(username, password)
+    if (!authResult.exists) {
+      return {
+        status: 'user_not_found',
+        message: '등록되지 않은 사용자입니다'
+      }
+    }
+    if (!authResult.valid) {
+      return {
+        status: 'unauthorized',
+        message: '비밀번호가 틀렸습니다'
+      }
+    }
+
+    // 2. 현재 주 범위 계산 (사용자 로컬 타임존)
+    const { weekStart, weekEnd } = getCurrentWeekRange()
+
+    // 3. 이번 달 1일과 말일 계산
+    const now = new Date()
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+
+    // 4. 이번 달에 사용한 구제 기록 조회
+    const { data, error } = await supabase
+      .from('exemptions')
+      .select('*')
+      .eq('username', username)
+      .gte('used_at', monthStart.toISOString())
+      .lte('used_at', monthEnd.toISOString())
+      .order('used_at', { ascending: false })
+      .limit(1)
+
+    if (error) throw error
+
+    const hasUsedThisMonth = data && data.length > 0
+    const usedRecord = hasUsedThisMonth ? data[0] : null
+
+    return {
+      status: 'success',
+      canUse: !hasUsedThisMonth,
+      usedRecord: usedRecord,
+      currentWeek: { weekStart, weekEnd }
+    }
+  } catch (error) {
+    console.error('Error checking exemption:', error)
+    return {
+      status: 'error',
+      message: error.message
+    }
+  }
+}
+
+/**
+ * 구제권 사용하기
+ */
+export async function useExemption(username, password, weekStart, weekEnd) {
+  try {
+    // 1. 비밀번호 확인
+    const authResult = await verifyUser(username, password)
+    if (!authResult.exists) {
+      return {
+        status: 'user_not_found',
+        message: '등록되지 않은 사용자입니다'
+      }
+    }
+    if (!authResult.valid) {
+      return {
+        status: 'unauthorized',
+        message: '비밀번호가 틀렸습니다'
+      }
+    }
+
+    // 2. 이번 달 사용 가능 여부 재확인
+    const checkResult = await canUseExemption(username, password)
+    if (checkResult.status !== 'success') {
+      return checkResult
+    }
+    if (!checkResult.canUse) {
+      return {
+        status: 'already_used',
+        message: '이번 달 구제권을 이미 사용했습니다'
+      }
+    }
+
+    // 3. user_id 가져오기
+    const { data: userData } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', username)
+      .single()
+
+    // 4. 구제 기록 삽입
+    const { error } = await supabase
+      .from('exemptions')
+      .insert([{
+        user_id: userData.id,
+        username: username,
+        applied_week_start: weekStart,
+        applied_week_end: weekEnd
+      }])
+
+    if (error) throw error
+
+    return {
+      status: 'success',
+      message: '구제권이 사용되었습니다',
+      appliedWeek: { weekStart, weekEnd }
+    }
+  } catch (error) {
+    console.error('Error using exemption:', error)
+    return {
+      status: 'error',
+      message: error.message
+    }
+  }
+}
+
+/**
+ * 특정 주의 구제 사용자 목록 조회 (admin용)
+ */
+export async function getExemptionsForWeek(weekStart, weekEnd) {
+  try {
+    const { data, error } = await supabase
+      .from('exemptions')
+      .select('username, used_at')
+      .eq('applied_week_start', weekStart)
+      .eq('applied_week_end', weekEnd)
+
+    if (error) throw error
+
+    return {
+      status: 'success',
+      exemptions: data || []
+    }
+  } catch (error) {
+    console.error('Error fetching exemptions:', error)
+    return {
+      status: 'error',
+      exemptions: []
+    }
+  }
+}
+
+// ========================================
 // Weekly Reports API
 // ========================================
 
@@ -443,7 +626,7 @@ export async function getLatestWeeklyReport() {
     const { data, error } = await supabase
       .from('weekly_reports')
       .select('*')
-      .order('week_start', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(1)
       .single()
     
@@ -474,17 +657,44 @@ export async function getLatestWeeklyReport() {
 
 /**
  * 수동으로 주간 리포트 생성 (관리자용)
+ * @param {boolean} isThisWeek - true면 이번 주, false면 지난 주
  */
-export async function generateWeeklyReportManually() {
+export async function generateWeeklyReportManually(isThisWeek = false) {
   try {
-    const { error } = await supabase
-      .rpc('generate_weekly_report')
-    
-    if (error) throw error
-    
-    return {
-      status: 'success',
-      message: '주간 리포트가 생성되었습니다'
+    // 이번 주 리포트를 생성하는 경우, 직접 계산해서 생성
+    if (isThisWeek) {
+      // EST 기준 이번 주 계산
+      const now = new Date()
+      const estDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+      
+      // 이번 주 월요일 계산
+      const dayOfWeek = estDate.getDay() // 0=일, 1=월, ...
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // 월요일로 이동
+      const monday = new Date(estDate)
+      monday.setDate(estDate.getDate() + diff)
+      monday.setHours(0, 0, 0, 0)
+      
+      const sunday = new Date(monday)
+      sunday.setDate(monday.getDate() + 6)
+      
+      const weekStart = monday.toISOString().split('T')[0]
+      const weekEnd = sunday.toISOString().split('T')[0]
+      
+      console.log('이번 주 리포트 생성:', weekStart, '~', weekEnd)
+      
+      // 수동으로 리포트 데이터 생성
+      return await generateReportForWeek(weekStart, weekEnd)
+    } else {
+      // 지난 주 리포트 (기존 함수 사용)
+      const { error } = await supabase
+        .rpc('generate_weekly_report')
+      
+      if (error) throw error
+      
+      return {
+        status: 'success',
+        message: '지난 주 리포트가 생성되었습니다'
+      }
     }
   } catch (error) {
     console.error('Error generating report:', error)
@@ -495,3 +705,136 @@ export async function generateWeeklyReportManually() {
   }
 }
 
+/**
+ * 특정 주의 리포트 생성 (클라이언트 사이드)
+ */
+async function generateReportForWeek(weekStart, weekEnd) {
+  try {
+    // 모든 사용자 가져오기
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('username')
+      .order('username')
+    
+    if (usersError) throw usersError
+    
+    const reportUsers = []
+    
+    for (const user of users) {
+      // 해당 주의 인증 기록 가져오기
+      const { data: checkins } = await supabase
+        .from('checkins')
+        .select('date')
+        .eq('username', user.username)
+      
+      // date는 'MM/DD' 형식이므로 파싱해서 비교
+      const weekStartDate = new Date(weekStart + 'T00:00:00')
+      const weekEndDate = new Date(weekEnd + 'T00:00:00')
+      
+      const validDates = new Set()
+      
+      checkins?.forEach(c => {
+        const [month, day] = c.date.split('/').map(Number)
+        const checkDate = new Date(weekStartDate.getFullYear(), month - 1, day)
+        
+        if (checkDate >= weekStartDate && checkDate <= weekEndDate) {
+          validDates.add(c.date)
+        }
+      })
+      
+      const count = validDates.size
+      const dates = Array.from(validDates).sort().join(', ') || '인증 없음'
+      const missing = 7 - count
+      const status = missing <= 1 ? '✅ 통과' : `⚠️ ${missing}일 누락`
+      
+      reportUsers.push({
+        username: user.username,
+        count,
+        dates,
+        missing,
+        status
+      })
+    }
+    
+    // 리포트 저장
+    const reportData = {
+      users: reportUsers,
+      generated_at: new Date().toISOString()
+    }
+    
+    const { error: insertError } = await supabase
+      .from('weekly_reports')
+      .upsert({
+        week_start: weekStart,
+        week_end: weekEnd,
+        report_data: reportData,
+        report_type: 'custom'
+      }, {
+        onConflict: 'week_start,week_end'
+      })
+    
+    if (insertError) throw insertError
+    
+    return {
+      status: 'success',
+      message: '이번 주 리포트가 생성되었습니다'
+    }
+  } catch (error) {
+    console.error('Error in generateReportForWeek:', error)
+    throw error
+  }
+}
+
+/**
+ * Official 주간 리포트 가져오기 (report_type='official', week_start 기준 최신)
+ */
+export async function getOfficialWeeklyReport() {
+  try {
+    const { data, error } = await supabase
+      .from('weekly_reports')
+      .select('*')
+      .eq('report_type', 'official')
+      .order('week_start', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return { status: 'success', report: null }
+      }
+      throw error
+    }
+    
+    return { status: 'success', report: data }
+  } catch (error) {
+    console.error('Error fetching official report:', error)
+    return { status: 'error', message: error.message, report: null }
+  }
+}
+
+/**
+ * Custom 주간 리포트 가져오기 (report_type='custom', created_at 기준 최신)
+ */
+export async function getCustomWeeklyReport() {
+  try {
+    const { data, error } = await supabase
+      .from('weekly_reports')
+      .select('*')
+      .eq('report_type', 'custom')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return { status: 'success', report: null }
+      }
+      throw error
+    }
+    
+    return { status: 'success', report: data }
+  } catch (error) {
+    console.error('Error fetching custom report:', error)
+    return { status: 'error', message: error.message, report: null }
+  }
+}
