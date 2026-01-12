@@ -331,6 +331,34 @@ h2 {
     to { opacity: 1; }
 }
 
+/* 주간 상태 배지 */
+.weekly-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-pass {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-dropout {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-exempted {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-none {
+    color: #999;
+}
+
 .loading {
     text-align: center;
     padding: 20px;

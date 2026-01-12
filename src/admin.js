@@ -471,27 +471,75 @@ async function loadUsers() {
   try {
     const result = await API.getUsersWithStats()
     
+    // Official 리포트 가져오기 (주간 상태 확인용)
+    const reportResult = await API.getOfficialWeeklyReport()
+    const weeklyStatus = {}
+    
+    if (reportResult.status === 'success' && reportResult.report) {
+      const reportData = reportResult.report.report_data.users
+      
+      // 구제권 사용자 조회
+      const exemptionResult = await API.getExemptionsForWeek(
+        reportResult.report.week_start, 
+        reportResult.report.week_end
+      )
+      const exemptedUsernames = exemptionResult.exemptions.map(e => e.username)
+      
+      // 각 사용자의 주간 상태 매핑 (renderWeeklyReport와 동일한 로직)
+      reportData.forEach(user => {
+        const isExempted = exemptedUsernames.includes(user.username)
+        const checkinDays = user.count || 0
+        
+        if (user.missing >= 2) {
+          if (isExempted) {
+            // 구제권 사용함
+            weeklyStatus[user.username] = {
+              text: `🛡️ 구제 (${checkinDays}일)`,
+              class: 'status-exempted'
+            }
+          } else {
+            // 방출 위기
+            weeklyStatus[user.username] = {
+              text: `⚠️ 방출 (${checkinDays}일)`,
+              class: 'status-dropout'
+            }
+          }
+        } else if (user.missing <= 1) {
+          // 통과
+          weeklyStatus[user.username] = {
+            text: `✅ 통과 (${checkinDays}일)`,
+            class: 'status-pass'
+          }
+        }
+      })
+    }
+    
     const tbody = document.getElementById('users-tbody')
     
     if (!result.users || result.users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5">등록된 사용자가 없습니다</td></tr>'
+      tbody.innerHTML = '<tr><td colspan="6">등록된 사용자가 없습니다</td></tr>'
       return
     }
     
-    tbody.innerHTML = result.users.map(user => `
+    tbody.innerHTML = result.users.map(user => {
+      const status = weeklyStatus[user.username] || { text: '-', class: 'status-none' }
+      
+      return `
       <tr>
         <td><strong>${user.username}</strong></td>
         <td>${user.checkinCount}회</td>
         <td>${user.lastCheckin || '-'}</td>
+        <td><span class="weekly-status ${status.class}">${status.text}</span></td>
         <td>${new Date(user.registeredDate).toLocaleDateString('ko-KR')}</td>
         <td>
           <button class="delete-btn" onclick="window.confirmDelete('${user.username}')">삭제</button>
         </td>
       </tr>
-    `).join('')
+      `
+    }).join('')
   } catch (error) {
     console.error('Error loading users:', error)
-    document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5">데이터 로드 실패</td></tr>'
+    document.getElementById('users-tbody').innerHTML = '<tr><td colspan="6">데이터 로드 실패</td></tr>'
   }
 }
 
