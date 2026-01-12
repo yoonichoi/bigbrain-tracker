@@ -27,9 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     dateElement.textContent = `Today: ${dateStr}`
   }
   
-  // 사용자 목록 로드
-  loadUsers()
-  
   // 이벤트 리스너 설정
   setupEventListeners()
   
@@ -97,11 +94,6 @@ function switchTab(tabName) {
   targetPage.classList.add('active')
   
   document.querySelector(`[data-tab="${tabName}"]`).classList.add('active')
-  
-  // 내 기록 탭이면 사용자 목록 로드
-  if (tabName === 'history') {
-    loadUsersForHistory()
-  }
 }
 
 function resetButtons() {
